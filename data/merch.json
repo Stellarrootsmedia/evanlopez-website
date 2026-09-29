@@ -1,0 +1,5 @@
+{
+  "_readme": "Set store_url to your shop (Fourthwall or Shopify + Printful). Each product: name, price (text, e.g. \"$32\"), image (put files in assets/merch/), url. While 'products' is empty the site shows the 'first drop' waitlist.",
+  "store_url": "",
+  "products": []
+}

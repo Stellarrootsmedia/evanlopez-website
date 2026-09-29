@@ -1,0 +1,4 @@
+.DS_Store
+assets/photos/_originals/
+.dns-snapshot*
+__pycache__/

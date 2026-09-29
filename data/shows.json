@@ -1,0 +1,31 @@
+{
+  "_readme": "Weekly shows repeat automatically (weekday: 0=Mon ... 4=Fri ... 6=Sun). Add one-off/tour dates to 'dates' as YYYY-MM-DD; past dates hide themselves. Run python3 scripts/build.py after editing.",
+  "weekly": [
+    {
+      "name": "Daywalkers Comedy Show",
+      "presenter": "Top Flight Comedy",
+      "weekday": 4,
+      "time": "18:00",
+      "venue": "East Austin Comedy Club",
+      "address": "2505 E 6th St Ste D",
+      "city": "Austin",
+      "region": "TX",
+      "postal": "78702",
+      "role": "Producer & host",
+      "tickets": "https://www.eventbrite.com/e/top-flight-comedy-presents-daywalkers-comedy-show-tickets-886479824017?aff=evanlopezcom"
+    }
+  ],
+  "dates": [
+    {
+      "_example": "Copy this shape for tour dates, then remove the leading underscore from 'date'.",
+      "_date": "2026-11-14",
+      "time": "20:00",
+      "name": "Evan Lopez",
+      "venue": "Club name",
+      "city": "Dallas",
+      "region": "TX",
+      "address": "",
+      "tickets": "https://"
+    }
+  ]
+}
