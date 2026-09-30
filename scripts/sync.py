@@ -4,7 +4,7 @@ and cache video thumbnails locally as WebP.
 
 Run from the site root:  python3 scripts/sync.py && python3 scripts/build.py
 (The GitHub Action in .github/workflows/refresh.yml runs both every day.)"""
-import json, os, re, html, urllib.request, xml.etree.ElementTree as ET
+import json, os, re, html, time, urllib.request, xml.etree.ElementTree as ET
 from email.utils import parsedate_to_datetime
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -16,8 +16,10 @@ NS = {"itunes": "http://www.itunes.com/dtds/podcast-1.0.dtd",
 BIRD = re.compile(r"\bbird|birds\b|birding|birdwatch|cardinal|pigeon|crow|hawk|owl|sparrow|grackle|robin|blue ?jay|hummingbird|feathered|birdyverse", re.I)
 
 
-def get(url):
-    return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=30).read()
+def get(url, fresh=False):
+    if fresh:  # podcast hosts cache the feed; a throwaway query param gets the newest copy
+        url += ("&" if "?" in url else "?") + "nocache=" + str(int(time.time()))
+    return urllib.request.urlopen(urllib.request.Request(url, headers={**UA, "Cache-Control": "no-cache"}), timeout=30).read()
 
 
 def clean_desc(raw):
@@ -27,11 +29,12 @@ def clean_desc(raw):
 
 
 def norm(t):
-    return re.sub(r"[^a-z0-9]", "", (t or "").lower())
+    t = re.sub(r"^\s*seven minutes in evan\s*[:|\-–]\s*", "", (t or ""), flags=re.I)
+    return re.sub(r"[^a-z0-9]", "", t.lower())
 
 
 def sync_videos():
-    feed = ET.fromstring(get("https://www.youtube.com/feeds/videos.xml?channel_id=" + SITE["youtube_channel_id"]))
+    feed = ET.fromstring(get("https://www.youtube.com/feeds/videos.xml?channel_id=" + SITE["youtube_channel_id"], fresh=True))
     out = []
     for e in feed.findall("a:entry", NS):
         vid = e.findtext("yt:videoId", namespaces=NS)
@@ -75,11 +78,11 @@ def thumbs(videos):
 
 
 def sync_podcast(videos):
-    ch = ET.fromstring(get(SITE["podcast"]["rss"])).find("channel")
+    ch = ET.fromstring(get(SITE["podcast"]["rss"], fresh=True)).find("channel")
     yt = {norm(v["title"]): v["id"] for v in videos if not v["short"]}
     eps = []
     for i in ch.findall("item")[:60]:
-        title = (i.findtext("title") or "").strip()
+        title = re.sub(r"^\s*seven minutes in evan\s*[:|\-–]\s*", "", (i.findtext("title") or ""), flags=re.I).strip()
         dur = i.findtext("itunes:duration", namespaces=NS) or ""
         parts = [int(p) for p in dur.split(":") if p.isdigit()]
         secs = sum(p * 60 ** k for k, p in enumerate(reversed(parts))) if parts else 0

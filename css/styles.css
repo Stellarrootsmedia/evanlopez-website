@@ -159,15 +159,30 @@ p + p { margin-top: .9em; }
 .socials a:hover { color: #1a1408; background: var(--accent); border-color: var(--accent); }
 .hero-socials { margin-top: 1.8rem; }
 
-/* ---------- hero: centered, cinematic ---------- */
-.hero { position: relative; padding: clamp(3.5rem, 8vw, 6rem) 0 clamp(3rem, 6vw, 4.5rem); text-align: center; }
+/* ---------- hero: centered, with two photos blended into the night ---------- */
+.hero { position: relative; overflow: hidden; text-align: center; padding: clamp(5rem, 11vw, 9rem) 0 clamp(6rem, 12vw, 10rem); isolation: isolate; }
+.hero-backdrop { position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.hero-backdrop img { position: absolute; top: 0; height: 100%; width: min(46%, 720px); object-fit: cover; opacity: .9;
+  -webkit-mask-composite: source-in; mask-composite: intersect; animation: drift-in 1.6s var(--ease) both; }
+.hero-backdrop .bg-l { left: 0; object-position: 45% 18%; filter: saturate(1.1) brightness(.9);
+  -webkit-mask-image: linear-gradient(90deg, #000 35%, transparent 96%), linear-gradient(0deg, transparent 0%, #000 38%);
+          mask-image: linear-gradient(90deg, #000 35%, transparent 96%), linear-gradient(0deg, transparent 0%, #000 38%); }
+.hero-backdrop .bg-r { right: 0; object-position: 40% 22%; filter: hue-rotate(-18deg) saturate(.95) brightness(.95);
+  -webkit-mask-image: linear-gradient(270deg, #000 35%, transparent 96%), linear-gradient(0deg, transparent 0%, #000 38%);
+          mask-image: linear-gradient(270deg, #000 35%, transparent 96%), linear-gradient(0deg, transparent 0%, #000 38%); }
+/* soft pool of darkness behind the name so text always reads */
+.hero::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: radial-gradient(ellipse 34% 55% at 50% 48%, rgba(3,20,26,.82), transparent 75%); }
+@media (prefers-reduced-motion: reduce) { .hero-backdrop img { animation: none; } }
+@keyframes drift-in { from { opacity: 0; transform: scale(1.06); } to { opacity: .9; transform: none; } }
 .hero-inner { display: flex; flex-direction: column; align-items: center; }
 .hero .eyebrow { justify-content: center; }
-.hero h1 { font-size: clamp(3.2rem, 1.6rem + 6.4vw, 6.8rem); line-height: .95; letter-spacing: -.035em; }
-.hero .lede { margin: 1.3rem auto 2rem; max-width: 34ch; }
+.hero h1 { font-size: clamp(3.2rem, 1.6rem + 6.4vw, 7rem); line-height: .95; letter-spacing: -.035em; text-shadow: 0 6px 40px rgba(0,0,0,.6); }
+.hero .lede { margin: 1.3rem auto 2rem; max-width: 34ch; color: #c9d4d6; }
 .hero-ctas { display: flex; flex-wrap: wrap; justify-content: center; gap: .8rem; }
 .hero-socials { justify-content: center; }
-.hero-photo { width: min(100%, 1100px); margin-top: clamp(2.6rem, 5vw, 3.8rem); border: 1px solid var(--line-2); border-radius: var(--radius-lg); overflow: hidden; }
+.hero-photo-wrap { position: relative; z-index: 2; margin-top: clamp(-5rem, -7vw, -2.5rem); }
+.hero-photo { width: min(100%, 1100px); margin: 0 auto; border: 1px solid var(--line-2); border-radius: var(--radius-lg); overflow: hidden; box-shadow: 0 50px 100px -40px rgba(0,0,0,.9), 0 0 0 1px rgba(82,182,194,.08); }
 .hero-photo img { width: 100%; aspect-ratio: 21 / 9; object-fit: cover; }
 .hero-sub { padding: clamp(3rem, 7vw, 5rem) 0 2rem; text-align: left; }
 .hero-sub h1 { font-size: var(--step-3); margin-bottom: 1rem; }
@@ -382,7 +397,11 @@ textarea { resize: vertical; }
   .lbl-lg { display: none; } .lbl-sm { display: inline; }
   .brand small { display: none; }
 
-  .hero { padding-top: 2.4rem; }
+  .hero { padding: 3rem 0 5rem; }
+  .hero-backdrop img { width: 58%; animation: none; opacity: .38; }
+  .hero-backdrop .bg-l { left: -14%; object-position: 35% 15%; }
+  .hero-backdrop .bg-r { right: -14%; object-position: 30% 20%; }
+  .hero::after { background: radial-gradient(ellipse 70% 50% at 50% 50%, rgba(3,20,26,.8), transparent 80%); }
   .hero .eyebrow { font-size: .64rem; letter-spacing: .14em; }
   .hero h1 { font-size: clamp(3rem, 15vw, 4.2rem); }
   .hero-ctas { width: 100%; } .hero-ctas .btn { width: 100%; }

@@ -18,6 +18,9 @@ PHOTOS = {
     # centered cinematic hero: wide 21:9 stage shot (desktop) + 4:3 crop (phones)
     "hero-wide":   ("Evan Lopez2.JPEG", (0.0, 0.0, 1.0, 0.6429), (1200, 2000)),
     "hero-wide-m": ("Evan Lopez2.JPEG", (0.2, 0.0, 0.8, 0.675), (800,)),
+    # blended hero backdrop: press-1 fades in from the left, foggy stage shot from the right
+    "bg-left":     ("DSC00957-2.jpg", (0.0, 0.02, 1.0, 0.78), (700, 1200)),
+    "bg-right":    ("Evan Website banner F.png", (0.36, 0.0, 1.0, 1.0), (700, 1200)),
     "about":       ("Evan Lopez.png", None, (800, 1200)),
     "podcast":     ("EvanPodcastcovercover.png", None, (600, 1200)),
     # on-stage gallery (4:5 frames)

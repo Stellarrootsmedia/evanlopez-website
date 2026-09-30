@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "14"  # cache-bust: bump when css/js change
+V = "16"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -367,13 +367,16 @@ def home():
     wide = photo("hero-wide", "Evan Lopez performing stand-up comedy on stage in Austin", "(max-width: 1180px) 100vw, 1100px", "hero-img", eager=True, widths=(1200, 2000))
     if wide and has("assets/photos/hero-wide-m-800.webp"):
         wide = f'<picture><source media="(max-width: 700px)" srcset="/assets/photos/hero-wide-m-800.webp">{wide}</picture>'
+    bg_left = photo("bg-left", "", "(max-width: 700px) 60vw, 42vw", "bg-l", eager=True, widths=(700, 1200))
+    bg_right = photo("bg-right", "", "(max-width: 700px) 60vw, 42vw", "bg-r", eager=True, widths=(700, 1200))
     about_img = photo("about", "Portrait of Austin comedian Evan Lopez", "(max-width: 700px) 90vw, 440px", "about-photo")
     bio = "".join(f"<p>{e(p)}</p>" for p in S["bio_long"])
     clubs = "".join(f"<li>{e(c)}</li>" for c in S["clubs"])
 
     body = f'''
-    <!-- HERO -->
+    <!-- HERO: two photos blended into the night on either side, name centered between -->
     <section class="hero">
+      <div class="hero-backdrop" aria-hidden="true">{bg_left}{bg_right}</div>
       <div class="wrap hero-inner">
         <p class="eyebrow">Stand-up comedian · Austin, Texas</p>
         <h1>Evan Lopez</h1>
@@ -383,9 +386,11 @@ def home():
           <a class="btn btn-ghost btn-lg" href="#videos">{icon("play",16)} Watch clips</a>
         </div>
         {socials_row("socials hero-socials")}
-        <figure class="hero-photo bracket">{wide}<figcaption class="cap">Live · Austin, TX</figcaption></figure>
       </div>
     </section>
+    <div class="wrap hero-photo-wrap">
+      <figure class="hero-photo bracket">{wide}<figcaption class="cap">Live · Austin, TX</figcaption></figure>
+    </div>
 
     <!-- QUICK LINKS (link-in-bio, but owned) -->
     <section class="section tight">

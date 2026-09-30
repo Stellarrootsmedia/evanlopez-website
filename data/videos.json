@@ -1,5 +1,13 @@
 [
  {
+  "id": "H4T5hcNsYis",
+  "title": "Seven Minutes In Evan: The Worm Guy",
+  "published": "2026-09-30",
+  "short": false,
+  "bird": false,
+  "views": 0
+ },
+ {
   "id": "dHQ_U4ObHa4",
   "title": "AI: More Free Time for Art or Just Lost Jobs? #shorts",
   "published": "2026-09-24",
@@ -29,7 +37,7 @@
   "published": "2026-09-24",
   "short": true,
   "bird": false,
-  "views": 3304
+  "views": 3306
  },
  {
   "id": "8hKKyGFosVI",
@@ -37,7 +45,7 @@
   "published": "2026-09-24",
   "short": false,
   "bird": false,
-  "views": 28
+  "views": 29
  },
  {
   "id": "nYtpPuYneKg",
@@ -110,13 +118,5 @@
   "short": false,
   "bird": false,
   "views": 161
- },
- {
-  "id": "S5kS-ro5rIY",
-  "title": "McGregor vs. Holloway Only Ends 2 Ways",
-  "published": "2026-07-10",
-  "short": false,
-  "bird": false,
-  "views": 9
  }
 ]
