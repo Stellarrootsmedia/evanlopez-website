@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "13"  # cache-bust: bump when css/js change
+V = "14"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -210,7 +210,7 @@ def page(path, title, desc, body, ld=(), noindex=False, og_type="website", prelo
   <meta name="description" content="{e(desc)}">
   <meta name="robots" content="{robots}">
   <link rel="canonical" href="{url}">
-  <meta name="theme-color" content="#07090c">
+  <meta name="theme-color" content="#03141a">
   <meta property="og:type" content="{og_type}">
   <meta property="og:site_name" content="Evan Lopez">
   <meta property="og:title" content="{e(title)}">

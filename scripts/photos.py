@@ -16,8 +16,8 @@ PHOTOS = {
     # phone hero: tall crop centered on Evan
     "hero-m":      ("Evan Website banner F.png", (0.36, 0.0, 0.92, 1.0), (800,)),
     # centered cinematic hero: wide 21:9 stage shot (desktop) + 4:3 crop (phones)
-    "hero-wide":   ("3E0A6707.jpg", (0.0, 0.13, 1.0, 0.7729), (1200, 2000)),
-    "hero-wide-m": ("3E0A6707.jpg", (0.28, 0.05, 0.83, 0.669), (800,)),
+    "hero-wide":   ("Evan Lopez2.JPEG", (0.0, 0.0, 1.0, 0.6429), (1200, 2000)),
+    "hero-wide-m": ("Evan Lopez2.JPEG", (0.2, 0.0, 0.8, 0.675), (800,)),
     "about":       ("Evan Lopez.png", None, (800, 1200)),
     "podcast":     ("EvanPodcastcovercover.png", None, (600, 1200)),
     # on-stage gallery (4:5 frames)
