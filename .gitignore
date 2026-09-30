@@ -2,3 +2,4 @@
 assets/photos/_originals/
 .dns-snapshot*
 __pycache__/
+_mockups/

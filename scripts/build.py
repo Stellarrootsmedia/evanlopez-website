@@ -306,8 +306,6 @@ def home():
     offs = one_offs()
     nxt = weekly_dates(weekly[0], 1)[0] if weekly else None
 
-    marquee_items = ["As seen on OFTV's LMAOF"] + S["clubs"] + ["Millions of views online", "Seven Minutes in Evan"]
-    mq = "".join(f"<li>{e(t)}</li>" for t in marquee_items)
 
     # shows
     tour = "".join(show_row(d, x) for d, x in offs[:12])
@@ -333,7 +331,7 @@ def home():
     clips = "".join(f'''<a class="frame clip" href="{c["url"]}" target="_blank" rel="noopener" aria-label="Watch on {c["platform"]}: {e(c["caption"])}">
             <img src="/assets/clips/{c["id"]}.webp" width="360" height="640" alt="" loading="lazy" decoding="async">
             <span class="play">{icon("play", 22)}</span>
-            <span class="tag"><b>{e(c["likes"])} likes</b> · {c["platform"]}</span></a>''' for c in S.get("featured_clips", []))
+            <span class="tag"><b>{e(c.get("views") or c["likes"])} {"views" if c.get("views") else "likes"}</b> · {c["platform"]}</span></a>''' for c in S.get("featured_clips", []))
     birds = [v for v in VIDS if v["bird"] and v["short"] and has(f'assets/video/{v["id"]}.webp')]
     clips += "".join(f'''<button class="frame clip yt-facade" data-yt="{v["id"]}" aria-label="Play: {e(untag(v["title"]))}">
             <img src="/assets/video/{v["id"]}.webp" width="202" height="360" alt="" loading="lazy" decoding="async">
@@ -395,18 +393,9 @@ def home():
           </div>
           {socials_row("socials hero-socials")}
         </div>
-        <dl class="stats">
-          <div><dt>Millions</dt><dd>of views on Instagram, TikTok &amp; YouTube</dd></div>
-          <div><dt>{POD["count"]}</dt><dd>podcast episodes and counting</dd></div>
-          <div><dt>Every</dt><dd>major Austin comedy club</dd></div>
-        </dl>
       </div>
     </section>
 
-    <!-- CREDITS -->
-    <div class="marquee" aria-label="Credits">
-      <div class="marquee-track"><ul>{mq}</ul><ul aria-hidden="true">{mq}</ul></div>
-    </div>
 
     <!-- QUICK LINKS (link-in-bio, but owned) -->
     <section class="section tight">
@@ -434,7 +423,7 @@ def home():
       <div class="wrap">
         <div class="sec-head split">
           <div><p class="eyebrow">Watch · the birdyverse</p><h2>Millions of views and counting</h2></div>
-          <p class="muted">Bird reviews, zoo encounters, Texas mosquitoes. Short comedy that took off on Instagram, TikTok and YouTube, with new videos every week.</p>
+          <p class="muted">Check me out on social media. New videos every week on Instagram, TikTok and YouTube.</p>
         </div>
         <div class="frames clips swipe">{clips}</div>
         <p class="swipe-hint" aria-hidden="true">Swipe →</p>
@@ -486,8 +475,6 @@ def home():
           <p class="eyebrow">About</p>
           <h2>Austin comedian, desert-raised</h2>
           <div class="bio">{bio}</div>
-          <p class="eyebrow mt">Where I've performed</p>
-          <ul class="club-list">{clubs}</ul>
           <a class="tf-card" href="{S["topflight"]["url"]}" target="_blank" rel="noopener">
             <span class="tf-kicker">Founder &amp; producer</span>
             <strong>Top Flight Comedy</strong>
