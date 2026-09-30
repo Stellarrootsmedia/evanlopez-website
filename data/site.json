@@ -14,11 +14,31 @@
     "sub": "First dibs on tickets, merch drops and new episodes. No spam, just me, occasionally, with something good."
   },
   "socials": [
-    {"name": "Instagram", "handle": "@iamevanlopez", "url": "https://www.instagram.com/iamevanlopez"},
-    {"name": "TikTok", "handle": "@iamevanlopez", "url": "https://www.tiktok.com/@iamevanlopez"},
-    {"name": "YouTube", "handle": "@EvanLopez", "url": "https://www.youtube.com/@EvanLopez"},
-    {"name": "Facebook", "handle": "EvanLopezComedy", "url": "https://www.facebook.com/EvanLopezComedy"},
-    {"name": "Threads", "handle": "@iamevanlopez", "url": "https://www.threads.com/@iamevanlopez"}
+    {
+      "name": "Instagram",
+      "handle": "@iamevanlopez",
+      "url": "https://www.instagram.com/iamevanlopez"
+    },
+    {
+      "name": "TikTok",
+      "handle": "@iamevanlopez",
+      "url": "https://www.tiktok.com/@iamevanlopez"
+    },
+    {
+      "name": "YouTube",
+      "handle": "@EvanLopez",
+      "url": "https://www.youtube.com/@EvanLopez"
+    },
+    {
+      "name": "Facebook",
+      "handle": "EvanLopezComedy",
+      "url": "https://www.facebook.com/EvanLopezComedy"
+    },
+    {
+      "name": "Threads",
+      "handle": "@iamevanlopez",
+      "url": "https://www.threads.com/@iamevanlopez"
+    }
   ],
   "podcast": {
     "name": "Seven Minutes in Evan",
@@ -46,19 +66,61 @@
     "Black Rabbit ATX",
     "East Austin Comedy Club"
   ],
-  "bio_short": "Evan Lopez is a stand-up comedian based in Austin, Texas. He was featured on OFTV's most-watched episode of the \"LMAOF\" stand-up series, hosts the weekly podcast Seven Minutes in Evan, and founded the Austin production company Top Flight Comedy.",
+  "bio_short": "Evan Lopez is a stand-up comedian based in Austin, Texas. He was featured on OFTV's most-watched episode of the \"LMAOF\" stand-up series, has millions of views across Instagram, TikTok and YouTube, hosts the weekly podcast Seven Minutes in Evan, and founded the Austin production company Top Flight Comedy.",
   "bio_long": [
     "Based in Austin, Texas, Evan Lopez has performed at the top comedy clubs in town, from the historic Creek and the Cave and the Comedy Mothership to Austin favorite Cap City Comedy Club, Sunset Strip Comedy Club and the underground Black Rabbit ATX. He's a regular at East Austin Comedy Club.",
-    "Evan was featured on OFTV's most-watched episode of the \"LMAOF\" stand-up specials. Lately his bird-watching series on Instagram and TikTok has taken off, with a growing flock of people who now know more about cardinals than they ever planned to.",
+    "Evan was featured on OFTV's most-watched episode of the \"LMAOF\" stand-up specials. Online, his bird-watching series and short comedy videos have pulled in millions of views across Instagram, TikTok and YouTube, with a growing flock of people who now know more about cardinals than they ever planned to.",
     "He was born in a small desert town in California to a mixed household. Growing up half white, half Puerto Rican, and a feral homeschool kid gave him the unusual upbringing he brings to the stage.",
     "Evan believes laughter is the best medicine. Unless you have good insurance."
   ],
   "faq": [
-    ["Who is Evan Lopez?", "Evan Lopez is a stand-up comedian based in Austin, Texas. He was featured on OFTV's most-watched episode of the \"LMAOF\" stand-up series, hosts the weekly comedy podcast Seven Minutes in Evan, and is the founder and producer of Top Flight Comedy. He's also known online for his viral bird-watching comedy series on Instagram and TikTok."],
-    ["Where can I see Evan Lopez perform in Austin?", "Evan performs at clubs across Austin, including Comedy Mothership, Cap City Comedy Club, The Creek and the Cave, Sunset Strip Comedy Club, Black Rabbit ATX and East Austin Comedy Club, where he's a regular. Current dates and ticket links are in the Shows section of evanlopez.com."],
-    ["What is Seven Minutes in Evan?", "Seven Minutes in Evan is Evan Lopez's comedy podcast, with a new episode every week. It covers whatever Evan is obsessed with that week: birds, movies, fights, parenting, sandwiches and a rotating cast of Austin comedians. Listen on Spotify, Apple Podcasts or YouTube."],
-    ["What are Evan Lopez's bird videos?", "The bird videos are Evan's comedic bird-watching series on Instagram and TikTok. He reviews, roasts and explains backyard birds in short videos. The series went viral and grew into what fans now call the birdyverse."],
-    ["What is Top Flight Comedy?", "Top Flight Comedy is an Austin, Texas comedy production company founded and run by Evan Lopez. It produces stand-up shows around Austin, including weekly shows at East Austin Comedy Club. More at topflightcomedy.com."],
-    ["How do I book Evan Lopez?", "For booking, press and podcast guest requests, email contact@evanlopez.com or use the booking form on evanlopez.com."]
+    [
+      "Who is Evan Lopez?",
+      "Evan Lopez is a stand-up comedian based in Austin, Texas. He was featured on OFTV's most-watched episode of the \"LMAOF\" stand-up series, hosts the weekly comedy podcast Seven Minutes in Evan, and is the founder and producer of Top Flight Comedy. Online, his comedy videos and viral bird-watching series have millions of views across Instagram, TikTok and YouTube."
+    ],
+    [
+      "Where can I see Evan Lopez perform in Austin?",
+      "Evan performs at clubs across Austin, including Comedy Mothership, Cap City Comedy Club, The Creek and the Cave, Sunset Strip Comedy Club, Black Rabbit ATX and East Austin Comedy Club, where he's a regular. Current dates and ticket links are in the Shows section of evanlopez.com."
+    ],
+    [
+      "What is Seven Minutes in Evan?",
+      "Seven Minutes in Evan is Evan Lopez's comedy podcast, with a new episode every week. It covers whatever Evan is obsessed with that week: birds, movies, fights, parenting, sandwiches and a rotating cast of Austin comedians. Listen on Spotify, Apple Podcasts or YouTube."
+    ],
+    [
+      "What are Evan Lopez's bird videos?",
+      "The bird videos are Evan's comedic bird-watching series on Instagram and TikTok, where he reviews, roasts and explains backyard birds in short videos. Along with his other short comedy clips, they've earned millions of views, and fans call the world of the series the birdyverse."
+    ],
+    [
+      "What is Top Flight Comedy?",
+      "Top Flight Comedy is an Austin, Texas comedy production company founded and run by Evan Lopez. It produces stand-up shows around Austin, including weekly shows at East Austin Comedy Club. More at topflightcomedy.com."
+    ],
+    [
+      "How do I book Evan Lopez?",
+      "For booking, press and podcast guest requests, email contact@evanlopez.com or use the booking form on evanlopez.com."
+    ]
+  ],
+  "views_claim": "Millions of views across Instagram, TikTok and YouTube",
+  "featured_clips": [
+    {
+      "id": "Db3KOxIPlS0",
+      "url": "https://www.instagram.com/p/Db3KOxIPlS0/",
+      "caption": "Different at the zoo",
+      "likes": "97K",
+      "platform": "Instagram"
+    },
+    {
+      "id": "DbVxjkTPzsB",
+      "url": "https://www.instagram.com/p/DbVxjkTPzsB/",
+      "caption": "For the birders who like hot birds",
+      "likes": "84K",
+      "platform": "Instagram"
+    },
+    {
+      "id": "DajfjXFN7Mb",
+      "url": "https://www.instagram.com/p/DajfjXFN7Mb/",
+      "caption": "Heeeey stranger",
+      "likes": "28K",
+      "platform": "Instagram"
+    }
   ]
 }

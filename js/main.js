@@ -75,6 +75,6 @@
   // gentle reveal (skipped for reduced motion)
   if (!matchMedia('(prefers-reduced-motion: reduce)').matches && 'IntersectionObserver' in window) {
     const io = new IntersectionObserver(es => es.forEach(x => { if (x.isIntersecting) { x.target.classList.add('in'); io.unobserve(x.target); } }), { rootMargin: '0px 0px -8% 0px' });
-    $$('.sec-head, .tile, .date-row, .weekly, .empty-tour, .latest, .merch-drop, .tf-card, .faq, .ep-card, .club').forEach(el => { el.classList.add('reveal'); io.observe(el); });
+    $$('.sec-head, .tile, .date-row, .weekly, .empty-tour, .frame, .latest, .merch-drop, .tf-card, .ep-card, .club').forEach(el => { el.classList.add('reveal'); io.observe(el); });
   }
 })();

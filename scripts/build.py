@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "7"  # cache-bust: bump when css/js change
+V = "11"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -141,7 +141,12 @@ def signup_form(fid, big=False):
         </form>'''
 
 
-NAV = [("Shows", "/#shows"), ("Podcast", "/#podcast"), ("Birds", "/#birds"), ("Merch", "/#merch"), ("About", "/#about")]
+NAV = [("Shows", "/#shows"), ("Videos", "/#videos"), ("Podcast", "/#podcast"), ("Merch", "/#merch"), ("About", "/#about")]
+
+MARK = ('<svg class="mark" width="30" height="30" viewBox="0 0 32 32" fill="none" aria-hidden="true">'
+        '<circle cx="16" cy="16" r="7.2" fill="currentColor"/>'
+        '<ellipse cx="16" cy="16" rx="14.5" ry="5" transform="rotate(-24 16 16)" stroke="currentColor" stroke-width="1.4"/>'
+        '<circle cx="28.4" cy="10.6" r="1.6" fill="currentColor"/></svg>')
 
 
 def header():
@@ -149,7 +154,7 @@ def header():
     return f'''<a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="/" aria-label="Evan Lopez home">{icon("bird", 22)}<span>Evan Lopez</span></a>
+      <a class="brand" href="/" aria-label="Evan Lopez home">{MARK}<span><b>Evan Lopez</b><small>Comedian · Austin, TX</small></span></a>
       <nav class="nav" aria-label="Main">
         <ul id="nav-list">{links}<li class="nav-social">{socials_row("socials socials-sm")}</li></ul>
       </nav>
@@ -161,23 +166,22 @@ def header():
 
 def footer():
     return f'''<footer class="site-footer">
-    <div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
     <div class="wrap footer-grid">
       <div>
-        <a class="brand brand-lg" href="/">{icon("bird", 28)}<span>Evan Lopez</span></a>
+        <a class="brand brand-lg" href="/">{MARK}<span><b>Evan Lopez</b><small>Comedian · Austin, TX</small></span></a>
         <p class="muted">Stand-up comedian in {S["city"]}, {S["region"]}. Host of <a href="/podcast/">{S["podcast"]["name"]}</a>. Founder of <a href="{S["topflight"]["url"]}" target="_blank" rel="noopener">{S["topflight"]["name"]}</a>.</p>
         {socials_row()}
       </div>
       <div>
-        <p class="eyebrow">Explore</p>
-        <ul class="flist"><li><a href="/#shows">Shows</a></li><li><a href="/podcast/">Podcast</a></li><li><a href="/#birds">Bird videos</a></li><li><a href="/#merch">Merch</a></li><li><a href="/austin-comedy/">Austin comedy guide</a></li></ul>
+        <p class="kicker">Explore</p>
+        <ul class="flist"><li><a href="/#shows">Shows</a></li><li><a href="/#videos">Videos</a></li><li><a href="/podcast/">Podcast</a></li><li><a href="/#merch">Merch</a></li><li><a href="/austin-comedy/">Austin comedy guide</a></li></ul>
       </div>
       <div>
-        <p class="eyebrow">Work with Evan</p>
+        <p class="kicker">Work with Evan</p>
         <ul class="flist"><li><a href="/press/">Press kit</a></li><li><a href="/#book">Booking</a></li><li><a href="mailto:{S["email"]}">{S["email"]}</a></li><li><a href="{S["topflight"]["url"]}" target="_blank" rel="noopener">Top Flight Comedy</a></li></ul>
       </div>
     </div>
-    <div class="wrap footer-base"><span>© <span data-year>{NOW.year}</span> Evan Lopez · Austin, Texas</span><a href="#top">Back to top ↑</a></div>
+    <div class="wrap footer-base"><span>© <span data-year>{NOW.year}</span> Evan Lopez · Austin, Texas</span><span class="coords">30.2672° N · 97.7431° W</span><a href="#top">Back to top ↑</a></div>
   </footer>'''
 
 
@@ -194,10 +198,9 @@ def gtag():
 '''
 
 
-def page(path, title, desc, body, ld=(), noindex=False, og_type="website", preload_img=""):
+def page(path, title, desc, body, ld=(), noindex=False, og_type="website", preload=""):
     url = BASE + path
     robots = "noindex, follow" if noindex else "index, follow, max-image-preview:large"
-    pre = f'\n  <link rel="preload" as="image" href="{preload_img}" fetchpriority="high">' if preload_img else ""
     return f'''<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -207,7 +210,7 @@ def page(path, title, desc, body, ld=(), noindex=False, og_type="website", prelo
   <meta name="description" content="{e(desc)}">
   <meta name="robots" content="{robots}">
   <link rel="canonical" href="{url}">
-  <meta name="theme-color" content="#140f0b">
+  <meta name="theme-color" content="#090f17">
   <meta property="og:type" content="{og_type}">
   <meta property="og:site_name" content="Evan Lopez">
   <meta property="og:title" content="{e(title)}">
@@ -222,12 +225,13 @@ def page(path, title, desc, body, ld=(), noindex=False, og_type="website", prelo
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
   <link rel="manifest" href="/site.webmanifest">
-  <link rel="preload" href="/assets/fonts/fraunces-800-italic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="/assets/fonts/inter-400-600.woff2" as="font" type="font/woff2" crossorigin>{pre}
+  <link rel="preload" href="/assets/fonts/space-grotesk-500-700.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/assets/fonts/inter-400-600.woff2" as="font" type="font/woff2" crossorigin>{preload}
   <link rel="stylesheet" href="/css/styles.css?v={V}">
 {ld_tags(ld)}
 </head>
 <body id="top">
+  <div class="starlayer" aria-hidden="true"></div>
   {header()}
   <main id="main">
 {body}
@@ -251,7 +255,7 @@ def faq_ld(faqs):
 
 
 def person_ld():
-    img = BASE + ("assets/photos/evan-lopez-1200.webp" if has("assets/photos/evan-lopez-1200.webp") else "assets/og-image.jpg")
+    img = BASE + ("assets/photos/about-1200.webp" if has("assets/photos/about-1200.webp") else "assets/og-image.jpg")
     return {"@context": "https://schema.org", "@graph": [
         {"@type": "Person", "@id": BASE + "#evan", "name": "Evan Lopez", "url": BASE, "image": img,
          "jobTitle": "Stand-up comedian", "description": S["bio_short"], "email": "mailto:" + S["email"],
@@ -264,62 +268,77 @@ def person_ld():
          "areaServed": {"@type": "City", "name": "Austin"}},
         {"@type": "PodcastSeries", "@id": BASE + "podcast/#series", "name": S["podcast"]["name"], "url": BASE + "podcast/",
          "description": S["podcast"]["tagline"], "author": {"@id": BASE + "#evan"}, "webFeed": S["podcast"]["rss"],
-         "image": BASE + "assets/podcast/cover-600.webp", "sameAs": [S["podcast"]["spotify"], S["podcast"]["apple"]]},
+         "image": BASE + "assets/photos/podcast-600.webp", "sameAs": [S["podcast"]["spotify"], S["podcast"]["apple"]]},
         {"@type": "WebSite", "@id": BASE + "#site", "url": BASE, "name": "Evan Lopez", "publisher": {"@id": BASE + "#evan"}},
     ]}
 
 
-def photo(name, alt, sizes, cls="", eager=False):
-    """<img> for a processed photo in assets/photos/<name>-{800,1200}.webp, or '' if not supplied yet."""
-    if not has(f"assets/photos/{name}-800.webp"):
+DIMS = json.load(open(os.path.join(ROOT, "assets/photos/dims.json"))) if has("assets/photos/dims.json") else {}
+
+
+def photo(name, alt, sizes, cls="", eager=False, widths=(800, 1200)):
+    """<img> for a processed photo (scripts/photos.py), or '' if it doesn't exist."""
+    ws = [w for w in widths if has(f"assets/photos/{name}-{w}.webp")]
+    if not ws:
         return ""
-    lazy = 'fetchpriority="high"' if eager else 'loading="lazy" decoding="async"'
-    from_dims = json.load(open(os.path.join(ROOT, "assets/photos/dims.json"))).get(name, [800, 1000])
-    return (f'<img class="{cls}" src="/assets/photos/{name}-800.webp" srcset="/assets/photos/{name}-800.webp 800w, '
-            f'/assets/photos/{name}-1200.webp 1200w" sizes="{sizes}" width="{from_dims[0]}" height="{from_dims[1]}" alt="{e(alt)}" {lazy}>')
+    w, h = DIMS.get(name, [800, 1000])
+    load_attr = 'fetchpriority="high"' if eager else 'loading="lazy" decoding="async"'
+    srcset = ", ".join(f"/assets/photos/{name}-{x}.webp {x}w" for x in ws)
+    return (f'<img class="{cls}" src="/assets/photos/{name}-{ws[0]}.webp" srcset="{srcset}" sizes="{sizes}" '
+            f'width="{w}" height="{h}" alt="{e(alt)}" {load_attr}>')
 
 
-SUN = '''<svg class="sun" viewBox="0 0 400 400" aria-hidden="true">
-          <defs><clipPath id="sunclip"><circle cx="200" cy="200" r="170"/></clipPath>
-          <linearGradient id="sung" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f2c14e"/><stop offset=".55" stop-color="#e3703a"/><stop offset="1" stop-color="#b8442a"/></linearGradient></defs>
-          <g clip-path="url(#sunclip)"><rect width="400" height="400" fill="url(#sung)"/>
-          <g fill="var(--night)"><rect y="226" width="400" height="6"/><rect y="250" width="400" height="9"/><rect y="276" width="400" height="12"/><rect y="305" width="400" height="15"/></g>
-          <path d="M0 350 L60 316 L96 330 L150 288 L204 326 L252 302 L300 334 L350 310 L400 332 V400 H0Z" fill="var(--night)"/>
-          <path d="M306 350 v-58 l-14-18 -4 -18 6 4 3 12 9 12 v-22 l-10-16 2-12 5 10 5 12 v-10 l8-20 4 4 -6 18 v26 l10-14 2-14 5 3 -3 14 -14 22 v60z" fill="var(--night)"/></g>
-          <circle cx="200" cy="200" r="184" fill="none" stroke="var(--mustard)" stroke-opacity=".35" stroke-width="1.5" stroke-dasharray="2 7"/>
-        </svg>'''
+def pod_cover(sizes, eager=False):
+    return photo("podcast", "Seven Minutes in Evan podcast cover art", sizes, "pod-img", eager, (600, 1200))
 
 
-# ---------------------------------------------------------------- home
+LIVE = [("live-1", "On stage", "Evan Lopez performing stand-up in Austin"),
+        ("live-2", "The crowd", "Audience laughing at an Evan Lopez comedy show"),
+        ("live-3", "Packed room", "A full comedy room during Evan Lopez's set"),
+        ("live-4", "Mic check", "Evan Lopez on stage in front of a red curtain"),
+        ("live-5", "Off stage", "Evan Lopez in a pool float under a neon sign")]
+
+
 def home():
     pod = POD["episodes"]
     latest = pod[0]
-    bird_clips = [v for v in VIDS if v["bird"] and v["short"]][:4]
     weekly = SHOWS["weekly"]
     offs = one_offs()
     nxt = weekly_dates(weekly[0], 1)[0] if weekly else None
 
-    hero_img = photo("hero", "Evan Lopez performing stand-up comedy in Austin, Texas", "(max-width: 700px) 90vw, 520px", "hero-photo", eager=True)
-    hero_visual = f'<div class="hero-art">{SUN}{hero_img}</div>'
-
-    marquee_items = ["As seen on OFTV's LMAOF"] + S["clubs"] + ["Seven Minutes in Evan"]
+    marquee_items = ["As seen on OFTV's LMAOF"] + S["clubs"] + ["Millions of views online", "Seven Minutes in Evan"]
     mq = "".join(f"<li>{e(t)}</li>" for t in marquee_items)
 
     # shows
     tour = "".join(show_row(d, x) for d, x in offs[:12])
-    if not tour:
-        tour = f'''<div class="empty-tour">
-            <p class="eyebrow">Tour dates</p>
-            <h3>New cities are coming.</h3>
-            <p>Sign up and I'll text you before tickets go public in your city. Knowing where people are also helps me decide where to go.</p>
-            <a class="btn btn-primary" href="#alerts">Get alerts for my city</a></div>'''
-    else:
+    if tour:
         tour = f'<ul class="dates">{tour}</ul>'
+    else:
+        tour = '''<div class="empty-tour">
+            <p class="eyebrow">Tour dates</p>
+            <h3>New cities incoming</h3>
+            <p>Tell me where you are and I'll text you before tickets go public near you. Where the list is biggest is where I go first.</p>
+            <a class="btn btn-primary" href="#alerts">Get alerts for my city</a></div>'''
+    days = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
     weekly_html = "".join(f'''<div class="weekly">
-            <div class="weekly-when"><span class="dot"></span>Every {["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"][w["weekday"]]} · {ftime(weekly_dates(w,1)[0])}</div>
+            <div class="weekly-when"><span class="dot"></span>Every {days[w["weekday"]]} · {ftime(weekly_dates(w,1)[0])}</div>
             <div class="weekly-body"><strong>{e(w["name"])}</strong><span>{e(w["venue"])}, {e(w["city"])} · {e(w["role"])}, with {e(w["presenter"])}</span>
             <span class="muted small">Next: <time data-weekly="{w["weekday"]}" data-time="{w["time"]}" datetime="{weekly_dates(w,1)[0].date().isoformat()}">{weekly_dates(w,1)[0].strftime("%a, %b %-d")}</time></span></div>
             <a class="btn btn-ghost btn-sm" href="{e(w["tickets"])}" target="_blank" rel="noopener">{icon("ticket",16)} Tickets</a></div>''' for w in weekly)
+
+    live = "".join(f'<figure class="frame">{photo(n, alt, "(max-width:700px) 58vw, 230px")}<figcaption class="tag">{t}</figcaption></figure>'
+                   for n, t, alt in LIVE if has(f"assets/photos/{n}-800.webp"))
+
+    # videos: featured Instagram clips first, then YouTube bird shorts
+    clips = "".join(f'''<a class="frame clip" href="{c["url"]}" target="_blank" rel="noopener" aria-label="Watch on {c["platform"]}: {e(c["caption"])}">
+            <img src="/assets/clips/{c["id"]}.webp" width="360" height="640" alt="" loading="lazy" decoding="async">
+            <span class="play">{icon("play", 22)}</span>
+            <span class="tag"><b>{e(c["likes"])} likes</b> · {c["platform"]}</span></a>''' for c in S.get("featured_clips", []))
+    birds = [v for v in VIDS if v["bird"] and v["short"] and has(f'assets/video/{v["id"]}.webp')]
+    clips += "".join(f'''<button class="frame clip yt-facade" data-yt="{v["id"]}" aria-label="Play: {e(untag(v["title"]))}">
+            <img src="/assets/video/{v["id"]}.webp" width="202" height="360" alt="" loading="lazy" decoding="async">
+            <span class="play">{icon("play", 22)}</span>
+            <span class="tag"><b>New</b> · YouTube<br>{e(untag(v["title"]))}</span></button>''' for v in birds[:5 - len(S.get("featured_clips", []))])
 
     # podcast
     def ep_row(ep):
@@ -327,15 +346,12 @@ def home():
         return (f'<li><a class="ep-title" href="{e(ep["url"] or S["podcast"]["spotify"])}" target="_blank" rel="noopener">{e(ep["title"])}</a>'
                 f'<span class="muted small">{dt.date.fromisoformat(ep["date"]).strftime("%b %-d")} · {ep["minutes"]} min{watch}</span></li>')
     recent = "".join(ep_row(x) for x in pod[1:5])
-    latest_media = (f'<button class="yt-facade wide" data-yt="{latest["youtube"]}" aria-label="Play: {e(latest["title"])}">'
-                    f'<img src="/assets/video/{latest["youtube"]}.webp" width="480" height="270" alt="" loading="lazy" decoding="async">'
-                    f'<span class="play">{icon("play", 26)}</span></button>') if latest["youtube"] and has(f'assets/video/{latest["youtube"]}.webp') else \
-        f'<button class="spot-facade" data-spotify="{S["podcast"]["spotify"].rsplit("/",1)[1]}">{icon("play",22)} Play the latest episode here</button>'
-
-    # birds
-    clips = "".join(f'''<button class="yt-facade short" data-yt="{v["id"]}" aria-label="Play: {e(v["title"])}">
-            <img src="/assets/video/{v["id"]}.webp" width="202" height="360" alt="" loading="lazy" decoding="async">
-            <span class="play">{icon("play", 22)}</span><span class="clip-title">{e(untag(v["title"]))}</span></button>''' for v in bird_clips if has(f'assets/video/{v["id"]}.webp'))
+    if latest["youtube"] and has(f'assets/video/{latest["youtube"]}.webp'):
+        latest_media = (f'<button class="yt-facade wide" data-yt="{latest["youtube"]}" aria-label="Play: {e(latest["title"])}">'
+                        f'<img src="/assets/video/{latest["youtube"]}.webp" width="480" height="270" alt="" loading="lazy" decoding="async">'
+                        f'<span class="play">{icon("play", 26)}</span></button>')
+    else:
+        latest_media = f'<button class="spot-facade" data-spotify="{S["podcast"]["spotify"].rsplit("/",1)[1]}">{icon("play",20)} Play the latest episode here</button>'
 
     # merch
     if MERCH["products"]:
@@ -345,47 +361,60 @@ def home():
         merch = f'<div class="products swipe">{cards}</div>' + (f'<p class="center"><a class="btn btn-ghost" href="{MERCH["store_url"]}" target="_blank" rel="noopener">Shop everything</a></p>' if MERCH["store_url"] else "")
     else:
         merch = f'''<div class="merch-drop">
-          <div class="tag-art" aria-hidden="true">{icon("shirt", 120)}<span class="stamp">Drop 01</span></div>
-          <div><h3>The first drop is in the works.</h3>
-          <p>Shirts, hats and a few things the birds would approve of. The drop list gets first access before anything goes public, and the first run will be small.</p>
+          {PATCH}
+          <div><p class="eyebrow">Drop 01 · In production</p><h3>The first merch drop is in the works</h3>
+          <p>Shirts, hats and a few things the birds would approve of. The first run will be small, and the list gets first access before it goes public.</p>
           <a class="btn btn-primary" href="#alerts">Get first access</a></div></div>'''
 
-    about_img = photo("about", "Portrait of comedian Evan Lopez", "(max-width: 700px) 90vw, 440px", "about-photo")
-    about_visual = about_img or f'<img class="about-photo pod-fallback" src="/assets/podcast/cover-600.webp" width="600" height="600" alt="Evan Lopez on the cover of Seven Minutes in Evan" loading="lazy" decoding="async">'
+    # each hero image only downloads at its own screen size (the other gets a 1px placeholder)
+    blank = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
+    hero_img = photo("hero", "Evan Lopez performing stand-up comedy on stage", "100vw", "hero-bg", eager=True, widths=(1200, 1920))
+    hero_m = photo("hero-m", "Evan Lopez performing stand-up comedy on stage", "100vw", "hero-m", eager=True, widths=(800,))
+    if hero_img:
+        hero_img = f'<picture><source media="(max-width: 700px)" srcset="{blank}">{hero_img}</picture>'
+    if hero_m:
+        hero_m = f'<picture><source media="(min-width: 701px)" srcset="{blank}">{hero_m}</picture>'
+
+    about_img = photo("about", "Portrait of Austin comedian Evan Lopez", "(max-width: 700px) 90vw, 440px", "about-photo")
     bio = "".join(f"<p>{e(p)}</p>" for p in S["bio_long"])
     clubs = "".join(f"<li>{e(c)}</li>" for c in S["clubs"])
 
     body = f'''
     <!-- HERO -->
     <section class="hero">
-      <div class="wrap hero-grid">
+      <div class="hero-media" aria-hidden="true">{hero_img}</div>
+      <div class="wrap hero-inner">
+        <div class="hero-top"><span>Stand-up comedian</span><span>Austin, Texas</span><span class="hide-sm">Transmitting weekly</span></div>
+        <figure class="hero-mobile">{hero_m}</figure>
         <div class="hero-copy">
-          <p class="eyebrow">Stand-up comedian · Austin, Texas</p>
-          <h1>Evan <em>Lopez</em></h1>
+          <h1>Evan<br>Lopez</h1>
           <p class="lede">{e(S["tagline"])}</p>
           <div class="hero-ctas">
             <a class="btn btn-primary btn-lg" href="#alerts">Get show alerts</a>
-            <a class="btn btn-ghost btn-lg" href="#podcast">{icon("mic",18)} Listen to the podcast</a>
+            <a class="btn btn-ghost btn-lg" href="#videos">{icon("play",16)} Watch clips</a>
           </div>
           {socials_row("socials hero-socials")}
         </div>
-        {hero_visual}
+        <dl class="stats">
+          <div><dt>Millions</dt><dd>of views on Instagram, TikTok &amp; YouTube</dd></div>
+          <div><dt>{POD["count"]}</dt><dd>podcast episodes and counting</dd></div>
+          <div><dt>Every</dt><dd>major Austin comedy club</dd></div>
+        </dl>
       </div>
     </section>
 
-    <!-- CREDITS MARQUEE -->
+    <!-- CREDITS -->
     <div class="marquee" aria-label="Credits">
-      <p class="sr">As seen on OFTV's LMAOF and at Austin comedy clubs:</p>
       <div class="marquee-track"><ul>{mq}</ul><ul aria-hidden="true">{mq}</ul></div>
     </div>
 
-    <!-- QUICK LINKS (the link-in-bio, but owned) -->
+    <!-- QUICK LINKS (link-in-bio, but owned) -->
     <section class="section tight">
       <div class="wrap tiles">
-        <a class="tile" href="#shows">{icon("ticket",26)}<span class="t-label">Live shows</span><span class="t-sub">{"Next: " + nxt.strftime("%a %-I %p") + " · East Austin" if nxt else "Dates &amp; tickets"}</span></a>
-        <a class="tile" href="#podcast">{icon("mic",26)}<span class="t-label">The podcast</span><span class="t-sub">New: {e(latest["title"][:38])}</span></a>
-        <a class="tile" href="#birds">{icon("bird",26)}<span class="t-label">Bird videos</span><span class="t-sub">Welcome to the birdyverse</span></a>
-        <a class="tile" href="#merch">{icon("shirt",26)}<span class="t-label">Merch</span><span class="t-sub">{"Shop now" if MERCH["products"] else "First drop soon"}</span></a>
+        <a class="tile" href="#shows"><span class="no">01 / Live</span><span class="t-label">Shows</span><span class="t-sub">{"Next: " + nxt.strftime("%a %-I %p") + " · East Austin" if nxt else "Dates &amp; tickets"}</span></a>
+        <a class="tile" href="#videos"><span class="no">02 / Watch</span><span class="t-label">Videos</span><span class="t-sub">The bird videos &amp; more</span></a>
+        <a class="tile" href="#podcast"><span class="no">03 / Listen</span><span class="t-label">Podcast</span><span class="t-sub">New: {e(latest["title"][:34])}</span></a>
+        <a class="tile" href="#merch"><span class="no">04 / Wear</span><span class="t-label">Merch</span><span class="t-sub">{"Shop now" if MERCH["products"] else "Drop 01 incoming"}</span></a>
       </div>
     </section>
 
@@ -395,28 +424,44 @@ def home():
         <div class="sec-head"><p class="eyebrow">Live</p><h2>Come see a show</h2></div>
         {tour}
         {weekly_html}
+        <div class="frames live swipe">{live}</div>
+        <p class="swipe-hint" aria-hidden="true">Swipe →</p>
+      </div>
+    </section>
+
+    <!-- VIDEOS -->
+    <section class="section band" id="videos">
+      <div class="wrap">
+        <div class="sec-head split">
+          <div><p class="eyebrow">Watch · the birdyverse</p><h2>Millions of views and counting</h2></div>
+          <p class="muted">Bird reviews, zoo encounters, Texas mosquitoes. Short comedy that took off on Instagram, TikTok and YouTube, with new videos every week.</p>
+        </div>
+        <div class="frames clips swipe">{clips}</div>
+        <p class="swipe-hint" aria-hidden="true">Swipe →</p>
+        <div class="follow-row">
+          <a class="btn btn-ghost" href="{S["socials"][0]["url"]}" target="_blank" rel="noopener">{icon("Instagram",18)} Instagram</a>
+          <a class="btn btn-ghost" href="{S["socials"][1]["url"]}" target="_blank" rel="noopener">{icon("TikTok",18)} TikTok</a>
+          <a class="btn btn-ghost" href="{S["socials"][2]["url"]}" target="_blank" rel="noopener">{icon("YouTube",18)} YouTube</a>
+        </div>
       </div>
     </section>
 
     <!-- PODCAST -->
-    <section class="section panel" id="podcast">
+    <section class="section" id="podcast">
       <div class="wrap pod-grid">
-        <div class="pod-cover">
-          <img src="/assets/podcast/cover-600.webp" srcset="/assets/podcast/cover-300.webp 300w, /assets/podcast/cover-600.webp 600w" sizes="(max-width:700px) 70vw, 360px" width="600" height="600" alt="Seven Minutes in Evan podcast cover art" loading="lazy" decoding="async">
-        </div>
+        <div class="pod-cover bracket">{pod_cover("(max-width:700px) 70vw, 380px")}</div>
         <div>
-          <p class="eyebrow">The podcast · {S["podcast"]["cadence"].lower()}</p>
+          <p class="eyebrow">Listen · {S["podcast"]["cadence"].lower()}</p>
           <h2>Seven Minutes in Evan</h2>
-          <p class="lede sm">{e(S["podcast"]["tagline"])} {POD["count"]} episodes and counting.</p>
+          <p class="lede sm">{e(S["podcast"]["tagline"])} {POD["count"]} episodes of birds, movies, fights, parenting and whatever else took over the week.</p>
           <div class="listen">
-            <a class="btn btn-listen" href="{S["podcast"]["spotify"]}" target="_blank" rel="noopener">{icon("Spotify")} Spotify</a>
-            <a class="btn btn-listen" href="{S["podcast"]["apple"]}" target="_blank" rel="noopener">{icon("Apple Podcasts")} Apple</a>
-            <a class="btn btn-listen" href="{S["podcast"]["youtube"]}" target="_blank" rel="noopener">{icon("YouTube")} YouTube</a>
+            <a class="btn btn-ghost btn-sm" href="{S["podcast"]["spotify"]}" target="_blank" rel="noopener">{icon("Spotify",18)} Spotify</a>
+            <a class="btn btn-ghost btn-sm" href="{S["podcast"]["apple"]}" target="_blank" rel="noopener">{icon("Apple Podcasts",18)} Apple</a>
+            <a class="btn btn-ghost btn-sm" href="{S["podcast"]["youtube"]}" target="_blank" rel="noopener">{icon("YouTube",18)} YouTube</a>
           </div>
           <div class="latest">
-            <p class="eyebrow accent">Latest episode</p>
+            <p class="eyebrow">Latest episode · {dt.date.fromisoformat(latest["date"]).strftime("%b %-d")} · {latest["minutes"]} min</p>
             <h3>{e(latest["title"])}</h3>
-            <p class="muted small">{dt.date.fromisoformat(latest["date"]).strftime("%B %-d, %Y")} · {latest["minutes"]} min</p>
             {latest_media}
           </div>
           <ul class="eps">{recent}</ul>
@@ -425,24 +470,8 @@ def home():
       </div>
     </section>
 
-    <!-- BIRDS -->
-    <section class="section" id="birds">
-      <div class="wrap">
-        <div class="sec-head split">
-          <div><p class="eyebrow">The birdyverse</p><h2>The bird videos</h2></div>
-          <p class="muted">A comedian who watches birds, rates birds and has a lot of opinions about birds. The series blew up on Instagram and TikTok, and new ones drop every week.</p>
-        </div>
-        <div class="clips swipe">{clips}</div>
-        <p class="swipe-hint" aria-hidden="true">Swipe →</p>
-        <div class="follow-row">
-          <a class="btn btn-ghost" href="{S["socials"][0]["url"]}" target="_blank" rel="noopener">{icon("Instagram")} Follow on Instagram</a>
-          <a class="btn btn-ghost" href="{S["socials"][1]["url"]}" target="_blank" rel="noopener">{icon("TikTok")} Follow on TikTok</a>
-        </div>
-      </div>
-    </section>
-
     <!-- MERCH -->
-    <section class="section panel" id="merch">
+    <section class="section band" id="merch">
       <div class="wrap">
         <div class="sec-head"><p class="eyebrow">Merch</p><h2>Wear the bit</h2></div>
         {merch}
@@ -452,7 +481,7 @@ def home():
     <!-- ABOUT -->
     <section class="section" id="about">
       <div class="wrap about-grid">
-        <div class="about-visual">{about_visual}</div>
+        <figure class="about-visual bracket">{about_img}<figcaption class="cap">Evan Lopez · Austin, TX</figcaption></figure>
         <div>
           <p class="eyebrow">About</p>
           <h2>Austin comedian, desert-raised</h2>
@@ -471,7 +500,6 @@ def home():
 
     <!-- ALERTS -->
     <section class="section alerts" id="alerts">
-      <div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
       <div class="wrap narrow center">
         <p class="eyebrow">The list</p>
         <h2>{e(S["signup"]["headline"])}</h2>
@@ -483,12 +511,12 @@ def home():
     {faq_block(S["faq"])}
 
     <!-- BOOKING -->
-    <section class="section panel" id="book">
+    <section class="section band" id="book">
       <div class="wrap book-grid">
         <div>
           <p class="eyebrow">Booking &amp; press</p>
           <h2>Work with Evan</h2>
-          <p>For club and private bookings, festivals, press, brand deals or joining the podcast, send a note and I'll get back to you.</p>
+          <p>Club and private bookings, festivals, press, brand deals or coming on the podcast. Send a note and I'll get back to you.</p>
           <p><a class="text-link" href="mailto:{S["email"]}">{icon("mail",18)} {S["email"]}</a></p>
           <p><a class="text-link" href="/press/">Press kit, bios &amp; photos {icon("arrow",16)}</a></p>
         </div>
@@ -497,10 +525,24 @@ def home():
     </section>
 '''
     ld = [person_ld(), {"@context": "https://schema.org", "@graph": events_ld()}, faq_ld(S["faq"])]
-    pre = "/assets/photos/hero-800.webp" if hero_img else ""
+    pre = ('\n  <link rel="preload" as="image" href="/assets/photos/hero-1920.webp" imagesrcset="/assets/photos/hero-1200.webp 1200w, '
+           '/assets/photos/hero-1920.webp 1920w" imagesizes="100vw" media="(min-width: 701px)" fetchpriority="high">') if hero_img else ""
     return page("", "Evan Lopez | Stand-Up Comedian in Austin, TX",
                 "Evan Lopez is an Austin stand-up comedian, host of the Seven Minutes in Evan podcast and founder of Top Flight Comedy. Shows, podcast, bird videos, merch.",
-                body, ld, preload_img=pre)
+                body, ld, preload=pre)
+
+
+PATCH = '''<svg class="patch" viewBox="0 0 240 240" aria-hidden="true">
+            <defs><path id="ring" d="M120 120 m-86 0 a86 86 0 1 1 172 0 a86 86 0 1 1 -172 0"/></defs>
+            <circle cx="120" cy="120" r="116" fill="var(--space-2)" stroke="var(--accent)" stroke-width="3"/>
+            <circle cx="120" cy="120" r="100" fill="none" stroke="var(--accent)" stroke-width="1" opacity=".5"/>
+            <circle cx="120" cy="120" r="68" fill="#0f1a28" stroke="var(--line-2)"/>
+            <text font-family="Space Mono, monospace" font-size="15" letter-spacing="4.2" fill="var(--cream)"><textPath href="#ring" startOffset="2%">EVAN LOPEZ · MERCH DIVISION · DROP 01 ·</textPath></text>
+            <circle cx="120" cy="120" r="22" fill="var(--accent)"/>
+            <ellipse cx="120" cy="120" rx="54" ry="16" fill="none" stroke="var(--cream)" stroke-width="2" transform="rotate(-22 120 120)"/>
+            <circle cx="166" cy="98" r="4.5" fill="var(--cream)"/>
+            <g fill="var(--cream)" opacity=".8"><circle cx="84" cy="84" r="1.4"/><circle cx="150" cy="156" r="1.2"/><circle cx="92" cy="150" r="1"/><circle cx="148" cy="80" r="1"/></g>
+          </svg>'''
 
 
 def contact_form():
@@ -534,7 +576,7 @@ def podcast_page():
     body = f'''
     <section class="hero hero-sub">
       <div class="wrap pod-grid">
-        <div class="pod-cover"><img src="/assets/podcast/cover-600.webp" width="600" height="600" alt="Seven Minutes in Evan podcast cover art" fetchpriority="high"></div>
+        <div class="pod-cover bracket">{pod_cover("(max-width:700px) 60vw, 380px", eager=True)}</div>
         <div>
           <p class="eyebrow">Podcast · {S["podcast"]["cadence"].lower()}</p>
           <h1>Seven Minutes in Evan</h1>
@@ -555,7 +597,7 @@ def podcast_page():
         <p class="center"><a class="btn btn-ghost" href="{S["podcast"]["spotify"]}" target="_blank" rel="noopener">Full archive on Spotify</a></p>
       </div>
     </section>
-    <section class="section alerts" id="alerts"><div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    <section class="section alerts" id="alerts">
       <div class="wrap narrow center"><p class="eyebrow">Never miss one</p><h2>Get new episodes, shows and drops</h2>{signup_form("signup-pod")}</div></section>
 '''
     ld = [person_ld(), {"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [
@@ -630,8 +672,8 @@ def austin_page():
 
 # ---------------------------------------------------------------- press kit
 def press_page():
-    photos = [n for n in ("press-1", "press-2", "press-3", "hero", "about") if has(f"assets/photos/{n}-1200.webp")]
-    grid = "".join(f'<a class="press-photo" href="/assets/photos/{n}-1200.webp" download>{photo(n, "Evan Lopez press photo", "(max-width:700px) 90vw, 360px")}<span>Download</span></a>' for n in photos) \
+    photos = [n for n in ("press-1", "press-2", "press-3", "press-4") if has(f"assets/photos/{n}-2400.webp")]
+    grid = "".join(f'<a class="press-photo" href="/assets/photos/{n}-2400.webp" download="evan-lopez-{n}.webp">{photo(n, "Evan Lopez press photo", "(max-width:700px) 45vw, 360px")}<span>Download hi-res</span></a>' for n in photos) \
         or '<p class="muted">Hi-res press photos coming soon. Email for photos in the meantime.</p>'
     long_bio = "".join(f"<p>{e(p)}</p>" for p in S["bio_long"])
     body = f'''
