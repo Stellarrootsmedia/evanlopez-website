@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "11"  # cache-bust: bump when css/js change
+V = "13"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -154,7 +154,7 @@ def header():
     return f'''<a class="skip" href="#main">Skip to content</a>
   <header class="site-header">
     <div class="wrap header-inner">
-      <a class="brand" href="/" aria-label="Evan Lopez home">{MARK}<span><b>Evan Lopez</b><small>Comedian · Austin, TX</small></span></a>
+      <a class="brand" href="/" aria-label="Evan Lopez home"><span><b>Evan Lopez</b><small>Comedian · Austin, TX</small></span></a>
       <nav class="nav" aria-label="Main">
         <ul id="nav-list">{links}<li class="nav-social">{socials_row("socials socials-sm")}</li></ul>
       </nav>
@@ -168,7 +168,7 @@ def footer():
     return f'''<footer class="site-footer">
     <div class="wrap footer-grid">
       <div>
-        <a class="brand brand-lg" href="/">{MARK}<span><b>Evan Lopez</b><small>Comedian · Austin, TX</small></span></a>
+        <a class="brand brand-lg" href="/"><span><b>Evan Lopez</b><small>Comedian · Austin, TX</small></span></a>
         <p class="muted">Stand-up comedian in {S["city"]}, {S["region"]}. Host of <a href="/podcast/">{S["podcast"]["name"]}</a>. Founder of <a href="{S["topflight"]["url"]}" target="_blank" rel="noopener">{S["topflight"]["name"]}</a>.</p>
         {socials_row()}
       </div>
@@ -210,7 +210,7 @@ def page(path, title, desc, body, ld=(), noindex=False, og_type="website", prelo
   <meta name="description" content="{e(desc)}">
   <meta name="robots" content="{robots}">
   <link rel="canonical" href="{url}">
-  <meta name="theme-color" content="#090f17">
+  <meta name="theme-color" content="#07090c">
   <meta property="og:type" content="{og_type}">
   <meta property="og:site_name" content="Evan Lopez">
   <meta property="og:title" content="{e(title)}">
@@ -364,15 +364,9 @@ def home():
           <p>Shirts, hats and a few things the birds would approve of. The first run will be small, and the list gets first access before it goes public.</p>
           <a class="btn btn-primary" href="#alerts">Get first access</a></div></div>'''
 
-    # each hero image only downloads at its own screen size (the other gets a 1px placeholder)
-    blank = "data:image/gif;base64,R0lGODlhAQABAAAAACH5BAEKAAEALAAAAAABAAEAAAICTAEAOw=="
-    hero_img = photo("hero", "Evan Lopez performing stand-up comedy on stage", "100vw", "hero-bg", eager=True, widths=(1200, 1920))
-    hero_m = photo("hero-m", "Evan Lopez performing stand-up comedy on stage", "100vw", "hero-m", eager=True, widths=(800,))
-    if hero_img:
-        hero_img = f'<picture><source media="(max-width: 700px)" srcset="{blank}">{hero_img}</picture>'
-    if hero_m:
-        hero_m = f'<picture><source media="(min-width: 701px)" srcset="{blank}">{hero_m}</picture>'
-
+    wide = photo("hero-wide", "Evan Lopez performing stand-up comedy on stage in Austin", "(max-width: 1180px) 100vw, 1100px", "hero-img", eager=True, widths=(1200, 2000))
+    if wide and has("assets/photos/hero-wide-m-800.webp"):
+        wide = f'<picture><source media="(max-width: 700px)" srcset="/assets/photos/hero-wide-m-800.webp">{wide}</picture>'
     about_img = photo("about", "Portrait of Austin comedian Evan Lopez", "(max-width: 700px) 90vw, 440px", "about-photo")
     bio = "".join(f"<p>{e(p)}</p>" for p in S["bio_long"])
     clubs = "".join(f"<li>{e(c)}</li>" for c in S["clubs"])
@@ -380,22 +374,18 @@ def home():
     body = f'''
     <!-- HERO -->
     <section class="hero">
-      <div class="hero-media" aria-hidden="true">{hero_img}</div>
       <div class="wrap hero-inner">
-        <div class="hero-top"><span>Stand-up comedian</span><span>Austin, Texas</span><span class="hide-sm">Transmitting weekly</span></div>
-        <figure class="hero-mobile">{hero_m}</figure>
-        <div class="hero-copy">
-          <h1>Evan<br>Lopez</h1>
-          <p class="lede">{e(S["tagline"])}</p>
-          <div class="hero-ctas">
-            <a class="btn btn-primary btn-lg" href="#alerts">Get show alerts</a>
-            <a class="btn btn-ghost btn-lg" href="#videos">{icon("play",16)} Watch clips</a>
-          </div>
-          {socials_row("socials hero-socials")}
+        <p class="eyebrow">Stand-up comedian · Austin, Texas</p>
+        <h1>Evan Lopez</h1>
+        <p class="lede">{e(S["tagline"])}</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary btn-lg" href="#alerts">Get show alerts</a>
+          <a class="btn btn-ghost btn-lg" href="#videos">{icon("play",16)} Watch clips</a>
         </div>
+        {socials_row("socials hero-socials")}
+        <figure class="hero-photo bracket">{wide}<figcaption class="cap">Live · Austin, TX</figcaption></figure>
       </div>
     </section>
-
 
     <!-- QUICK LINKS (link-in-bio, but owned) -->
     <section class="section tight">
@@ -512,8 +502,7 @@ def home():
     </section>
 '''
     ld = [person_ld(), {"@context": "https://schema.org", "@graph": events_ld()}, faq_ld(S["faq"])]
-    pre = ('\n  <link rel="preload" as="image" href="/assets/photos/hero-1920.webp" imagesrcset="/assets/photos/hero-1200.webp 1200w, '
-           '/assets/photos/hero-1920.webp 1920w" imagesizes="100vw" media="(min-width: 701px)" fetchpriority="high">') if hero_img else ""
+    pre = ""
     return page("", "Evan Lopez | Stand-Up Comedian in Austin, TX",
                 "Evan Lopez is an Austin stand-up comedian, host of the Seven Minutes in Evan podcast and founder of Top Flight Comedy. Shows, podcast, bird videos, merch.",
                 body, ld, preload=pre)
