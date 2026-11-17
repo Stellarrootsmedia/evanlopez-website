@@ -8,9 +8,9 @@
   "region": "TX",
   "tagline": "Austin stand-up comedian, podcast host, and bird enthusiast.",
   "signup": {
-    "_readme": "Paste your Laylo (or Kit) drop URL into signup_url once the account exists. Until then the on-site form emails new sign-ups to the address above via FormSubmit.",
+    "_readme": "The on-site form (home, podcast page and /join/) emails each new sign-up to the address above via FormSubmit until the Brevo fan-list form is connected. signup_url, if set, swaps the form for a button to that URL.",
     "signup_url": "",
-    "headline": "Get a text when I'm in your city",
+    "headline": "Get an email when I'm in your city",
     "sub": "First dibs on tickets, merch drops and new episodes. No spam, just me, occasionally, with something good."
   },
   "socials": [

@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "16"  # cache-bust: bump when css/js change
+V = "17"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -130,12 +130,13 @@ def signup_form(fid, big=False):
           <input type="hidden" name="_template" value="table">
           <input type="text" name="_honey" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
           <input type="hidden" name="list" value="fan alerts">
+          <input type="hidden" name="source" value="{fid}">
           <label class="sr" for="{fid}-email">Email</label>
           <input id="{fid}-email" type="email" name="email" placeholder="Email" autocomplete="email" required>
-          <label class="sr" for="{fid}-phone">Phone (optional)</label>
-          <input id="{fid}-phone" type="tel" name="phone" placeholder="Phone (optional)" autocomplete="tel">
+          <label class="sr" for="{fid}-name">First name</label>
+          <input id="{fid}-name" type="text" name="first_name" placeholder="First name" autocomplete="given-name">
           <label class="sr" for="{fid}-city">City</label>
-          <input id="{fid}-city" type="text" name="city" placeholder="Your city" autocomplete="address-level2">
+          <input id="{fid}-city" type="text" name="city" placeholder="Your city" autocomplete="address-level2" required>
           <button class="btn btn-primary" type="submit">Get alerts</button>
           <p class="form-note" role="status">Tickets, merch drops and new episodes. Unsubscribe anytime.</p>
         </form>'''
@@ -597,6 +598,29 @@ def crumbs(items):
     return {"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": lst}
 
 
+# ---------------------------------------------------------------- join the list (Instagram bio link)
+def join_page():
+    su, pod = S["signup"], S["podcast"]
+    links = [("ticket", "See upcoming shows", "/#shows", False), ("mic", "Listen to the podcast", "/podcast/", False),
+             ("play", "Watch on YouTube", pod["youtube"], True), ("arrow", "Merch", "/#merch", False)]
+    new_tab = ' target="_blank" rel="noopener"'
+    btns = "".join(f'<a class="btn btn-ghost" href="{h}"{new_tab if ext else ""}>{icon(i, 18)} {e(l)}</a>'
+                   for i, l, h, ext in links)
+    body = f'''
+    <section class="hero hero-sub join"><div class="wrap narrow center">
+      <p class="eyebrow">The list</p>
+      <h1>{e(su["headline"])}</h1>
+      <p class="lede sm">{e(su["sub"])}</p>
+      {signup_form("signup-join", big=True)}
+    </div></section>
+    <section class="section tight"><div class="wrap narrow center">
+      <p class="eyebrow">While you're here</p>
+      <div class="join-links">{btns}</div>
+    </div></section>'''
+    return page("join/", "Join Evan Lopez's email list", "Get an email when Evan Lopez has a show in your city, plus new podcast episodes and what he's working on.",
+                body, ld=[crumbs([("Join the list", "join/")])])
+
+
 # ---------------------------------------------------------------- austin comedy guide
 CLUB_NOTES = {
     "Comedy Mothership": "Joe Rogan's club on East Sixth Street, with two showrooms and a lineup of touring headliners and Austin regulars. Phones get locked up during shows.",
@@ -763,12 +787,12 @@ def llms():
 
 def main():
     pages = {"index.html": home(), "podcast/index.html": podcast_page(), "austin-comedy/index.html": austin_page(),
-             "press/index.html": press_page(), "404.html": not_found()}
+             "press/index.html": press_page(), "join/index.html": join_page(), "404.html": not_found()}
     for p, t in pages.items():
         write(p, t)
     for src, to in REDIRECTS.items():
         write(f"{src}/index.html", redirect_stub(to))
-    write("sitemap.xml", sitemap(["", "podcast/", "austin-comedy/", "press/"]))
+    write("sitemap.xml", sitemap(["", "podcast/", "austin-comedy/", "press/", "join/"]))
     write("llms.txt", llms())
     print(f"built {len(pages)} pages + {len(REDIRECTS)} redirects")
 
