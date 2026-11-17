@@ -1,0 +1,3 @@
+{
+ "_readme": "Episode articles, written by podcast-editor from each new episode's transcript (guide: ~/.claude/skills/podcast-editor/references/episode-article.md). Keyed by YouTube video ID. kind=episode builds /podcast/<slug>/ once the episode is in the Spotify feed; other videos build /watch/<slug>/. No entry = no page. _check notes are for Evan and are never shown."
+}

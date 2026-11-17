@@ -446,3 +446,49 @@ textarea { resize: vertical; }
   .footer-base { flex-direction: column; }
   .press-grid { grid-template-columns: 1fr 1fr; gap: .6rem; }
 }
+
+/* watch pages (/watch/<slug>/) */
+.crumbs { font-family: var(--mono); font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted-2); margin-bottom: 1.4rem; }
+.crumbs a { color: var(--muted); text-decoration: none; } .crumbs a:hover { color: var(--accent); }
+.watch-head { padding-bottom: .4rem; }
+.watch-head h1 { font-size: var(--step-2); line-height: 1.12; }
+.watch-head .yt-facade.wide { margin-top: 1.6rem; box-shadow: var(--shadow); }
+.watch-links { margin-top: 1rem; flex-wrap: wrap; }
+.watch-summary p { color: var(--cream); margin-bottom: 1rem; max-width: 68ch; }
+.watch-summary p:first-child { font-size: var(--step-1); line-height: 1.45; }
+.topics { list-style: none; padding: 0; display: flex; flex-wrap: wrap; gap: .45rem; margin-top: .2rem; }
+.topics li { font-family: var(--mono); font-size: .7rem; letter-spacing: .06em; padding: .3rem .65rem; border: 1px solid var(--line-2); border-radius: 999px; color: var(--muted); }
+.vids { margin-top: 2rem; }
+.vids-head { margin-bottom: .2rem; }
+.watch-listen { margin-top: 1.6rem; }
+.chapters { list-style: none; padding: 0; margin-top: 1rem; border-top: 1px solid var(--line); }
+.chapters li { border-bottom: 1px solid var(--line); }
+.chapters a, .chapters li > span:first-child { text-decoration: none; }
+.chapters a, .chapters li { display: flex; gap: 1rem; padding: .6rem 0; align-items: baseline; }
+.chapters li:has(a) { padding: 0; }
+.chapters span { font-family: var(--mono); font-size: .74rem; color: var(--accent); min-width: 3.6em; }
+.chapters a:hover { color: var(--accent); }
+.prevnext { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin-top: 2.4rem; }
+.pn { display: block; padding: 1rem 1.2rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); text-decoration: none; }
+.pn:hover { border-color: var(--accent); }
+.pn .kicker { margin-bottom: .35rem; font-size: .64rem; }
+.pn b { font-family: var(--display); font-weight: 600; line-height: 1.25; display: block; }
+.pn-next { grid-column: 2; text-align: right; } .pn-next .kicker { justify-content: flex-end; }
+@media (max-width: 560px) { .prevnext { grid-template-columns: 1fr; } .pn-next { grid-column: auto; } }
+.ep-card h3 a { text-decoration: none; } .ep-card h3 a:hover { color: var(--accent); }
+.dek { color: var(--muted); font-size: var(--step-1); line-height: 1.4; max-width: 60ch; margin-top: -.2rem; }
+.guests { margin: 2rem 0 0; padding: 1.1rem 1.3rem; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.guests .kicker { margin-bottom: .5rem; }
+.guests ul { list-style: none; padding: 0; display: grid; gap: .35rem; color: var(--muted); }
+.guests b { color: var(--cream); font-weight: 600; } .guests a { color: var(--cream); }
+.article p { margin-bottom: 1rem; max-width: 68ch; }
+.article h2, .watch-head ~ .section h2.mt { font-size: var(--step-1); line-height: 1.2; }
+blockquote.pull { margin: 1.6rem 0; padding: .2rem 0 .2rem 1.2rem; border-left: 2px solid var(--accent); }
+blockquote.pull p { font-family: var(--display); font-size: var(--step-1); line-height: 1.35; color: var(--cream); }
+blockquote.pull cite { display: block; margin-top: .5rem; font-style: normal; font-family: var(--mono); font-size: .72rem; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.ts { font-family: var(--mono); font-size: .74rem; color: var(--accent); text-decoration: none; }
+a.ts:hover { text-decoration: underline; }
+.transcript { border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); }
+.transcript summary { cursor: pointer; padding: 1rem 1.3rem; font-family: var(--mono); font-size: .76rem; letter-spacing: .1em; text-transform: uppercase; color: var(--teal); }
+.transcript-body { padding: 0 1.3rem 1.2rem; max-height: 70vh; overflow-y: auto; color: var(--muted); font-size: .95rem; }
+.transcript-body p { margin-bottom: .7rem; } .transcript-body b { color: var(--cream); font-weight: 600; }

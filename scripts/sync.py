@@ -30,6 +30,7 @@ def clean_desc(raw):
 
 def norm(t):
     t = re.sub(r"^\s*seven minutes in evan\s*[:|\-–]\s*", "", (t or ""), flags=re.I)
+    t = re.sub(r"^\s*(ep|episode)\.?\s*\d+\s*[:|\-–.]\s*", "", t, flags=re.I)  # "Ep 12: Title" on Spotify
     return re.sub(r"[^a-z0-9]", "", t.lower())
 
 
@@ -45,11 +46,14 @@ def sync_videos():
                     "short": "/shorts/" in link or "#shorts" in title.lower(),
                     "bird": bool(BIRD.search(title)),
                     "views": int(stats.get("views")) if stats is not None else 0})
-    # keep previously-seen bird clips so the section never empties when the feed rolls over
+    # keep previously-seen bird clips (so the section never empties when the feed rolls over)
+    # and any video with a write-up in data/writeups.json (so its /watch/ page keeps its date + thumbnail)
     path = os.path.join(ROOT, "data/videos.json")
+    wpath = os.path.join(ROOT, "data/writeups.json")
+    written = set(json.load(open(wpath))) if os.path.exists(wpath) else set()
     if os.path.exists(path):
         seen = {v["id"] for v in out}
-        out += [v for v in json.load(open(path)) if v.get("bird") and v["id"] not in seen]
+        out += [v for v in json.load(open(path)) if (v.get("bird") or v["id"] in written) and v["id"] not in seen]
     json.dump(out, open(path, "w"), indent=1, ensure_ascii=False)
     return out
 

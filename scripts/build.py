@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "17"  # cache-bust: bump when css/js change
+V = "18"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -17,6 +17,8 @@ def load(name):
 
 
 S, SHOWS, MERCH, POD, VIDS = (load(n) for n in ("site.json", "shows.json", "merch.json", "podcast.json", "videos.json"))
+# optional: SEO/GEO write-ups keyed by YouTube video ID (written by the show-producer "site sync" step)
+WRITEUPS = load("writeups.json") if os.path.exists(os.path.join(ROOT, "data/writeups.json")) else {}
 BASE = S["url"]
 NOW = dt.datetime.now(TZ)
 e = html.escape
@@ -199,8 +201,15 @@ def gtag():
 '''
 
 
-def page(path, title, desc, body, ld=(), noindex=False, og_type="website", preload=""):
+def page(path, title, desc, body, ld=(), noindex=False, og_type="website", preload="", og_image=None):
     url = BASE + path
+    if og_image:
+        og = f'<meta property="og:image" content="{e(og_image)}">'
+    else:
+        og = f'''<meta property="og:image" content="{BASE}assets/og-image.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="Evan Lopez, stand-up comedian in Austin, Texas">'''
     robots = "noindex, follow" if noindex else "index, follow, max-image-preview:large"
     return f'''<!DOCTYPE html>
 <html lang="en">
@@ -217,10 +226,7 @@ def page(path, title, desc, body, ld=(), noindex=False, og_type="website", prelo
   <meta property="og:title" content="{e(title)}">
   <meta property="og:description" content="{e(desc)}">
   <meta property="og:url" content="{url}">
-  <meta property="og:image" content="{BASE}assets/og-image.jpg">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta property="og:image:alt" content="Evan Lopez, stand-up comedian in Austin, Texas">
+  {og}
   <meta name="twitter:card" content="summary_large_image">
   <link rel="icon" href="/assets/favicon-64.png" sizes="64x64" type="image/png">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
@@ -341,8 +347,8 @@ def home():
 
     # podcast
     def ep_row(ep):
-        watch = f' · <a href="https://www.youtube.com/watch?v={ep["youtube"]}" target="_blank" rel="noopener">Watch</a>' if ep["youtube"] else ""
-        return (f'<li><a class="ep-title" href="{e(ep["url"] or S["podcast"]["spotify"])}" target="_blank" rel="noopener">{e(ep["title"])}</a>'
+        watch = f' · {watch_link(ep["youtube"], "Watch")}' if ep["youtube"] and not ep_page(ep) else ""
+        return (f'<li>{ep_title_link(ep, "ep-title")}'
                 f'<span class="muted small">{dt.date.fromisoformat(ep["date"]).strftime("%b %-d")} · {ep["minutes"]} min{watch}</span></li>')
     recent = "".join(ep_row(x) for x in pod[1:5])
     if latest["youtube"] and has(f'assets/video/{latest["youtube"]}.webp'):
@@ -446,11 +452,12 @@ def home():
           </div>
           <div class="latest">
             <p class="eyebrow">Latest episode · {dt.date.fromisoformat(latest["date"]).strftime("%b %-d")} · {latest["minutes"]} min</p>
-            <h3>{e(latest["title"])}</h3>
+            <h3>{ep_title_link(latest)}</h3>
             {latest_media}
           </div>
           <ul class="eps">{recent}</ul>
           <a class="text-link" href="/podcast/">All episodes {icon("arrow",16)}</a>
+          {latest_videos_block(3)}
         </div>
       </div>
     </section>
@@ -546,15 +553,25 @@ def contact_form():
 
 
 # ---------------------------------------------------------------- podcast page
+def ep_title_link(ep, cls=""):
+    """Episode title: links to its /podcast/<slug>/ page when it has a write-up, else out to Spotify."""
+    c = f' class="{cls}"' if cls else ""
+    p = ep_page(ep)
+    if p:
+        return f'<a{c} href="/{p["path"]}">{e(ep["title"])}</a>'
+    return f'<a{c} href="{e(ep["url"] or S["podcast"]["spotify"])}" target="_blank" rel="noopener">{e(ep["title"])}</a>'
+
+
 def podcast_page():
     eps = POD["episodes"]
     rows = []
     for ep in eps:
         d = dt.date.fromisoformat(ep["date"])
-        watch = f'<a href="https://www.youtube.com/watch?v={ep["youtube"]}" target="_blank" rel="noopener">{icon("YouTube",16)} Watch</a>' if ep["youtube"] else ""
+        watch = watch_link(ep["youtube"], f'{icon("YouTube",16)} Watch') if ep["youtube"] and not ep_page(ep) else ""
         rows.append(f'''<li class="ep-card"><div class="ep-meta"><time datetime="{ep["date"]}">{d.strftime("%b %-d, %Y")}</time> · {ep["minutes"]} min</div>
-          <h3>{e(ep["title"])}</h3>{f'<p>{e(ep["desc"][:260])}{"…" if len(ep["desc"]) > 260 else ""}</p>' if ep["desc"] else ""}
-          <div class="ep-links"><a href="{e(ep["url"] or S["podcast"]["spotify"])}" target="_blank" rel="noopener">{icon("play",16)} Listen</a>{watch}</div></li>''')
+          <h3>{ep_title_link(ep)}</h3>{f'<p>{e(ep["desc"][:260])}{"…" if len(ep["desc"]) > 260 else ""}</p>' if ep["desc"] else ""}
+          <div class="ep-links">{f'<a href="/{ep_page(ep)["path"]}">{icon("arrow",16)} Episode page</a>' if ep_page(ep) else ""}<a href="{e(ep["url"] or S["podcast"]["spotify"])}" target="_blank" rel="noopener">{icon("play",16)} Listen</a>{watch}</div></li>''')
+    vids = f'<section class="section tight"><div class="wrap narrow">{latest_videos_block(6, h2=True)}</div></section>' if WATCH else ""
     body = f'''
     <section class="hero hero-sub">
       <div class="wrap pod-grid">
@@ -572,6 +589,7 @@ def podcast_page():
         </div>
       </div>
     </section>
+    {vids}
     <section class="section">
       <div class="wrap narrow">
         <div class="sec-head"><p class="eyebrow">Episodes</p><h2>Latest episodes</h2></div>
@@ -584,7 +602,7 @@ def podcast_page():
 '''
     ld = [person_ld(), {"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [
         {"@type": "ListItem", "position": i + 1, "item": {"@type": "PodcastEpisode", "name": ep["title"], "datePublished": ep["date"],
-         "url": ep["url"], "partOfSeries": {"@id": BASE + "podcast/#series"}, "timeRequired": f"PT{ep['minutes']}M"}}
+         "url": BASE + ep_page(ep)["path"] if ep_page(ep) else ep["url"], "partOfSeries": {"@id": BASE + "podcast/#series"}, "timeRequired": f"PT{ep['minutes']}M"}}
         for i, ep in enumerate(eps[:20])]},
         crumbs([("Podcast", "podcast/")])]
     return page("podcast/", "Seven Minutes in Evan Podcast | Evan Lopez",
@@ -715,6 +733,350 @@ def press_page():
                 body, [person_ld(), crumbs([("Press kit", "press/")])])
 
 
+# ---------------------------------------------------------------- write-up pages
+# data/writeups.json is keyed by YouTube video ID or episode slug. Written by podcast-editor from the
+# episode transcript (guide: ~/.claude/skills/podcast-editor/references/episode-article.md):
+#   {"<key>": {"kind": "episode", "slug", "title", "dek", "summary" (answer-first lead),
+#              "guests": [{"name", "bio", "url"}], "sections": [{"heading", "body", "quote": {"text", "who", "t"}}],
+#              "quotes": [{"text", "who", "t"}], "takeaways": [], "topics": [], "chapters": [["0:00", "Intro"], ...],
+#              "episode": spotify url, "transcript": "data/transcripts/<slug>.md", "updated": "YYYY-MM-DD",
+#              optional "published", "minutes", "_check": [notes for Evan, never rendered]}}
+# A write-up that matches a podcast episode (by its YouTube ID or its slug) becomes ONE page at /podcast/<slug>/.
+# Anything else (topicals, sketches) becomes /watch/<slug>/. No write-up = no page (no thin pages from the RSS blurb).
+SLUG = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+
+
+def norm_title(t):
+    """Title key that survives 'Seven Minutes in Evan:' / 'Ep 12:' prefixes and punctuation."""
+    t = re.sub(r"^\s*seven minutes in evan\s*[:|\-–]\s*", "", (t or ""), flags=re.I)
+    t = re.sub(r"^\s*(ep|episode)\.?\s*\d+\s*[:|\-–.]\s*", "", t, flags=re.I)
+    return re.sub(r"[^a-z0-9]", "", t.lower())
+
+
+def slugify(t):
+    t = re.sub(r"&", " and ", t.lower())
+    return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+
+
+def _check(w, where):
+    slug = w.get("slug", "")
+    if not SLUG.match(slug):
+        raise SystemExit(f"writeups.json: bad slug {slug!r} ({where})")
+    lead = len(w["summary"].split())
+    if w.get("sections"):
+        total = lead + sum(len((x.get("heading", "") + " " + x.get("body", "")).split()) for x in w["sections"])
+        if not 30 <= lead <= 110:
+            print(f"  note: {slug} lead is {lead} words (target 40-90 when the article has sections)")
+        if total < 500:
+            print(f"  note: {slug} article is {total} words (target 600-1500)")
+    elif not 120 <= lead <= 250:
+        print(f"  note: {slug} summary is {lead} words (target 120-250)")
+    if w.get("transcript") and not has(w["transcript"]):
+        raise SystemExit(f"writeups.json: {slug} transcript file {w['transcript']} not found")
+
+
+def _split_writeups():
+    vids = {v["id"]: v for v in VIDS}
+    by_yt = {x["youtube"]: x for x in POD["episodes"] if x.get("youtube")}
+    by_slug = {slugify(x["title"]): x for x in POD["episodes"]}
+    by_norm = {norm_title(x["title"]): x for x in POD["episodes"]}
+    eps, watch, slugs = {}, [], set()
+    for key, w in WRITEUPS.items():
+        if key.startswith("_"):
+            continue  # room for notes like "_readme"
+        ep = (by_yt.get(key) or by_slug.get(key) or by_slug.get(w.get("slug", ""))
+              or by_norm.get(norm_title(w.get("title", ""))) or by_norm.get(norm_title(w.get("match_title", ""))))
+        if not ep and w.get("kind") == "episode":
+            # never let an episode fall back to a /watch/ page (duplicate); wait for the Spotify feed
+            print(f"  waiting: {w.get('slug', key)} isn't in podcast.json yet (builds once the episode is in the feed)"); continue
+        if ep:
+            w = {**w, "slug": w.get("slug") or slugify(ep["title"])}
+            _check(w, key)
+            if w["slug"] in slugs:
+                raise SystemExit(f"writeups.json: duplicate slug {w['slug']!r}")
+            slugs.add(w["slug"])
+            vid = ep.get("youtube", "")
+            eps[ep["url"] or ep["title"]] = {**w, "id": vid, "title": w.get("title") or ep["title"],
+                                             "published": ep["date"], "minutes": ep["minutes"],
+                                             "episode": w.get("episode") or ep["url"] or "",
+                                             "thumb_local": f"/assets/video/{vid}.webp" if vid and has(f"assets/video/{vid}.webp") else ""}
+            continue
+        v = vids.get(key, {})
+        _check(w, key)
+        if w["slug"] in slugs:
+            raise SystemExit(f"writeups.json: duplicate slug {w['slug']!r}")
+        published = w.get("published") or v.get("published")
+        if not published:
+            print(f"  skip watch page {w['slug']}: no publish date (add \"published\" to its write-up)"); continue
+        slugs.add(w["slug"])
+        watch.append({**w, "id": key, "title": w.get("title") or untag(v.get("title", "")),
+                      "published": published, "minutes": w.get("minutes") or 0, "episode": "",
+                      "thumb_local": f"/assets/video/{key}.webp" if has(f"assets/video/{key}.webp") else ""})
+    # episodes keep podcast.json order (newest first)
+    ep_pages = [eps[k] for k in (x["url"] or x["title"] for x in POD["episodes"]) if k in eps]
+    for p in ep_pages:
+        p["path"] = f'podcast/{p["slug"]}/'
+    for w in watch:
+        w["path"] = f'watch/{w["slug"]}/'
+    return ep_pages, sorted(watch, key=lambda x: x["published"], reverse=True)
+
+
+EP_PAGES, WATCH = _split_writeups()
+PAGE_BY_YT = {p["id"]: p for p in EP_PAGES + WATCH if p["id"]}
+EP_PAGE_BY_URL = {p["episode"]: p for p in EP_PAGES if p["episode"]}
+
+
+def ep_page(ep):
+    """The /podcast/<slug>/ page for a podcast.json episode, or None."""
+    return EP_PAGE_BY_URL.get(ep.get("url")) or (PAGE_BY_YT.get(ep.get("youtube")) if ep.get("youtube") else None)
+
+
+def watch_link(vid, label):
+    """Internal link when the video has a page, else YouTube."""
+    if vid in PAGE_BY_YT:
+        return f'<a href="/{PAGE_BY_YT[vid]["path"]}">{label}</a>'
+    return f'<a href="https://www.youtube.com/watch?v={vid}" target="_blank" rel="noopener">{label}</a>'
+
+
+def _fdate(d, year=False):
+    return dt.date.fromisoformat(d).strftime("%b %-d, %Y" if year else "%b %-d")
+
+
+def video_rows(items):
+    return "".join(f'<li><a class="ep-title" href="/{w["path"]}">{e(w["title"])}</a>'
+                   f'<span class="muted small">{_fdate(w["published"])}{" · " + str(w["minutes"]) + " min" if w["minutes"] else ""}</span></li>'
+                   for w in items)
+
+
+def latest_videos_block(n, h2=False):
+    if not WATCH:
+        return ""
+    head = ('<div class="sec-head"><p class="eyebrow">Watch</p><h2>Latest videos</h2></div>' if h2
+            else '<p class="eyebrow vids-head">Latest videos</p>')
+    more = f'<a class="text-link" href="/watch/">All videos {icon("arrow",16)}</a>' if len(WATCH) > n else ""
+    return f'<div class="vids">{head}<ul class="eps">{video_rows(WATCH[:n])}</ul>{more}</div>'
+
+
+def _thumb_url(w):
+    if w["thumb_local"]:
+        return BASE + w["thumb_local"].lstrip("/")
+    return f'https://i.ytimg.com/vi/{w["id"]}/hqdefault.jpg' if w["id"] else BASE + "assets/photos/podcast-1200.webp"
+
+
+def _secs(t):
+    parts = [int(x) for x in str(t).split(":")]
+    return sum(p * 60 ** k for k, p in enumerate(reversed(parts)))
+
+
+def _chapters(w):
+    out = []
+    for c in w.get("chapters", []):
+        t, title = (c["t"], c["title"]) if isinstance(c, dict) else c
+        out.append((str(t), _secs(t), title))
+    return out
+
+
+def video_ld(w, standalone=True):
+    o = {"@type": "VideoObject", "@id": BASE + w["path"] + "#video",
+         "name": w["title"], "description": w["summary"].split("\n")[0],
+         "thumbnailUrl": [_thumb_url(w), f'https://i.ytimg.com/vi/{w["id"]}/hqdefault.jpg'],
+         "uploadDate": w["published"] + "T00:00:00-06:00",
+         "contentUrl": f'https://www.youtube.com/watch?v={w["id"]}',
+         "embedUrl": f'https://www.youtube.com/embed/{w["id"]}',
+         "url": BASE + w["path"], "inLanguage": "en-US", "creator": {"@id": BASE + "#evan"}}
+    if standalone:
+        o = {"@context": "https://schema.org", **o, "publisher": {"@id": BASE + "#evan"}}
+    if w["minutes"]:
+        o["duration"] = f'PT{w["minutes"]}M'
+    chs = _chapters(w)
+    if chs:
+        ends = [s for _, s, _ in chs[1:]] + [w["minutes"] * 60 if w["minutes"] else None]
+        o["hasPart"] = [{"@type": "Clip", "name": title, "startOffset": s, **({"endOffset": end} if end else {}),
+                         "url": f'https://www.youtube.com/watch?v={w["id"]}&t={s}s'} for (_, s, title), end in zip(chs, ends)]
+    if w.get("topics"):
+        o["keywords"] = ", ".join(w["topics"])
+    return o
+
+
+def episode_ld(w):
+    o = {"@context": "https://schema.org", "@type": "PodcastEpisode", "@id": BASE + w["path"] + "#episode",
+         "name": w["title"], "url": BASE + w["path"], "description": w["summary"].split("\n")[0],
+         "datePublished": w["published"], "partOfSeries": {"@id": BASE + "podcast/#series"},
+         "author": {"@id": BASE + "#evan"}, "inLanguage": "en-US",
+         "associatedMedia": [], "sameAs": [w["episode"]] if w["episode"] else []}
+    if w["minutes"]:
+        o["timeRequired"] = f'PT{w["minutes"]}M'
+    if w.get("audio"):
+        o["associatedMedia"].append({"@type": "AudioObject", "contentUrl": w["audio"]})
+    elif w["episode"]:
+        o["associatedMedia"].append({"@type": "AudioObject", "url": w["episode"], "name": w["title"]})
+    if w["id"]:
+        o["associatedMedia"].append(video_ld(w, standalone=False))
+    if w.get("topics"):
+        o["about"] = [{"@type": "Thing", "name": t} for t in w["topics"]]
+    if w.get("guests"):
+        o["actor"] = [{"@type": "Person", "name": g["name"], **({"sameAs": g["url"]} if g.get("url") else {})} for g in w["guests"]]
+    if w.get("updated"):
+        o["dateModified"] = w["updated"]
+    return o
+
+
+def _media(w):
+    if w["id"]:
+        img = (f'<img src="{w["thumb_local"]}" width="480" height="270" alt="" fetchpriority="high">' if w["thumb_local"]
+               else f'<img src="https://i.ytimg.com/vi/{w["id"]}/hqdefault.jpg" width="480" height="360" alt="" fetchpriority="high">')
+        return f'<button class="yt-facade wide" data-yt="{w["id"]}" aria-label="Play: {e(w["title"])}">{img}<span class="play">{icon("play", 26)}</span></button>'
+    if w["episode"]:
+        return f'<a class="btn btn-listen watch-listen" href="{e(w["episode"])}" target="_blank" rel="noopener">{icon("Spotify")} Listen on Spotify</a>'
+    return ""
+
+
+def _ts(w, t, label=None):
+    """Timestamp label; a YouTube deep link when the episode has a video."""
+    label = e(label or str(t))
+    if w["id"] and t not in (None, ""):
+        return f'<a class="ts" href="https://www.youtube.com/watch?v={w["id"]}&amp;t={_secs(t)}s" target="_blank" rel="noopener">{label}</a>'
+    return f'<span class="ts">{label}</span>'
+
+
+def _paras(text):
+    return "".join(f"<p>{e(p.strip())}</p>" for p in text.split("\n") if p.strip())
+
+
+def _quote(w, q):
+    who = f'<cite>{e(q["who"])}{" · " + _ts(w, q["t"]) if q.get("t") else ""}</cite>' if q.get("who") or q.get("t") else ""
+    return f'<blockquote class="pull"><p>{e(q["text"])}</p>{who}</blockquote>'
+
+
+def _transcript(w):
+    path = w.get("transcript")
+    if not path or not has(path):
+        return ""
+    rows = []
+    for line in open(os.path.join(ROOT, path)).read().splitlines():
+        m = re.match(r"^\s*\[(\d{1,2}(?::\d{2}){1,2})\]\s*(?:([^:]{1,40}):\s*)?(.+)$", line)
+        if m:
+            t, who, text = m.groups()
+            rows.append(f'<p>{_ts(w, t)} {f"<b>{e(who)}:</b> " if who else ""}{e(text)}</p>')
+        elif line.strip():
+            rows.append(f"<p>{e(line.strip())}</p>")
+    return (f'<details class="transcript mt"><summary>Full transcript</summary>'
+            f'<div class="transcript-body">{"".join(rows)}</div></details>') if rows else ""
+
+
+def _guest(g):
+    name = e(g["name"])
+    if g.get("url"):
+        name = f'<a href="{e(g["url"])}" target="_blank" rel="noopener">{name}</a>'
+    bio = " · " + e(g["bio"]) if g.get("bio") else ""
+    return f"<li><b>{name}</b>{bio}</li>"
+
+
+def _writeup_body(w):
+    takeaways = "".join(f"<li>{e(t)}</li>" for t in w.get("takeaways", []))
+    topics = "".join(f"<li>{e(t)}</li>" for t in w.get("topics", []))
+    chs = "".join(f'<li><a href="https://www.youtube.com/watch?v={w["id"]}&amp;t={s}s" target="_blank" rel="noopener"><span>{e(t)}</span>{e(title)}</a></li>'
+                  if w["id"] else f"<li><span>{e(t)}</span>{e(title)}</li>" for t, s, title in _chapters(w))
+    guests = "".join(_guest(g) for g in w.get("guests", []))
+    sections = "".join(f'<h2 class="mt">{e(x["heading"])}</h2>{_paras(x.get("body", ""))}{_quote(w, x["quote"]) if x.get("quote") else ""}'
+                       for x in w.get("sections", []))
+    quotes = "".join(_quote(w, q) for q in w.get("quotes", []))
+    return (f'<div class="watch-summary">{_paras(w["summary"])}</div>'
+            + (f'<div class="guests"><p class="kicker">On this episode</p><ul>{guests}</ul></div>' if guests else "")
+            + (f'<div class="article">{sections}</div>' if sections else "")
+            + (f'<h2 class="mt">Lines worth hearing</h2>{quotes}' if quotes else "")
+            + (f'<h2 class="mt">Takeaways</h2><ul class="tips">{takeaways}</ul>' if takeaways else "")
+            + (f'<h2 class="mt">Chapters</h2><ol class="chapters">{chs}</ol>' if chs else "")
+            + (f'<p class="kicker mt">Topics &amp; names</p><ul class="topics">{topics}</ul>' if topics else "")
+            + _transcript(w))
+
+
+def _desc(w):
+    d = re.split(r"(?<=[.!?])\s", w["summary"].strip(), 1)[0]
+    return d if len(d) <= 158 else d[:155].rsplit(" ", 1)[0] + "…"
+
+
+def episode_page(w):
+    i = EP_PAGES.index(w)
+    newer, older = (EP_PAGES[i - 1] if i > 0 else None), (EP_PAGES[i + 1] if i + 1 < len(EP_PAGES) else None)
+    pn = "".join(f'<a class="pn {cls}" href="/{x["path"]}"><span class="kicker">{lbl}</span><b>{e(x["title"])}</b></a>'
+                 for x, cls, lbl in ((older, "pn-prev", "← Previous episode"), (newer, "pn-next", "Next episode →")) if x)
+    links = []
+    if w["episode"] and w["id"]:
+        links.append(f'<a href="{e(w["episode"])}" target="_blank" rel="noopener">{icon("Spotify",16)} Spotify</a>')
+    links.append(f'<a href="{S["podcast"]["apple"]}" target="_blank" rel="noopener">{icon("Apple Podcasts",16)} Apple</a>')
+    if w["id"]:
+        links.append(f'<a href="https://www.youtube.com/watch?v={w["id"]}" target="_blank" rel="noopener">{icon("YouTube",16)} YouTube</a>')
+    body = f'''
+    <section class="hero hero-sub watch-head">
+      <div class="wrap narrow">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/podcast/">Podcast</a></nav>
+        <p class="eyebrow">{e(S["podcast"]["name"])} · {_fdate(w["published"], True)}{f' · {w["minutes"]} min' if w["minutes"] else ""}</p>
+        <h1>{e(w["title"])}</h1>
+        {f'<p class="dek">{e(w["dek"])}</p>' if w.get("dek") else ""}
+        {_media(w)}
+        <div class="ep-links watch-links">{"".join(links)}</div>
+      </div>
+    </section>
+    <section class="section tight">
+      <div class="wrap narrow">
+        {_writeup_body(w)}
+        {f'<nav class="prevnext" aria-label="More episodes">{pn}</nav>' if pn else ""}
+        <p class="mt"><a class="text-link" href="/podcast/">All episodes of {e(S["podcast"]["name"])} {icon("arrow",16)}</a></p>
+        <div class="cta-box"><h2>See Evan live</h2><p>Stand-up in Austin most weeks. Get a text when there's a show near you.</p>
+          <a class="btn btn-primary" href="/#shows">See shows</a> <a class="btn btn-ghost" href="/#alerts">Get alerts</a></div>
+      </div>
+    </section>
+'''
+    ld = [episode_ld(w), crumbs([("Podcast", "podcast/"), (w["title"], w["path"])])]
+    return page(w["path"], f'{w["title"]} | {S["podcast"]["name"]} Podcast', _desc(w), body, ld,
+                og_type="video.episode" if w["id"] else "article", og_image=_thumb_url(w))
+
+
+def watch_page(w):
+    i = WATCH.index(w)
+    related = (WATCH[i + 1:] + WATCH[:i])[:4]
+    meta = _fdate(w["published"], True) + (f' · {w["minutes"]} min' if w["minutes"] else "")
+    rel = f'<h2 class="mt">More videos</h2><ul class="eps">{video_rows(related)}</ul>' if related else ""
+    body = f'''
+    <section class="hero hero-sub watch-head">
+      <div class="wrap narrow">
+        <nav class="crumbs" aria-label="Breadcrumb"><a href="/">Home</a> / <a href="/watch/">Videos</a></nav>
+        <p class="eyebrow">Video · {meta}</p>
+        <h1>{e(w["title"])}</h1>
+        {_media(w)}
+        <div class="ep-links watch-links"><a href="https://www.youtube.com/watch?v={w["id"]}" target="_blank" rel="noopener">{icon("YouTube",16)} YouTube</a><a href="/podcast/">{icon("mic",16)} Podcast</a></div>
+      </div>
+    </section>
+    <section class="section tight">
+      <div class="wrap narrow">
+        {_writeup_body(w)}
+        {rel}
+        <div class="cta-box"><h2>Hear more</h2><p>{e(S["podcast"]["name"])} is a weekly comedy podcast from Austin stand-up comedian Evan Lopez.</p>
+          <a class="btn btn-primary" href="/podcast/">Podcast episodes</a> <a class="btn btn-ghost" href="/#shows">See a live show</a></div>
+      </div>
+    </section>
+'''
+    ld = [video_ld(w), crumbs([("Videos", "watch/"), (w["title"], w["path"])])]
+    return page(w["path"], f'{w["title"]} | Evan Lopez', _desc(w), body, ld, og_type="video.other", og_image=_thumb_url(w))
+
+
+def watch_index():
+    body = f'''
+    <section class="hero hero-sub"><div class="wrap narrow">
+      <p class="eyebrow">Watch</p>
+      <h1>Videos</h1>
+      <p class="lede">Videos from Austin stand-up comedian Evan Lopez, each with a short write-up. Full podcast episodes are on the <a href="/podcast/">podcast page</a>.</p>
+    </div></section>
+    <section class="section tight"><div class="wrap narrow"><ul class="eps">{video_rows(WATCH)}</ul></div></section>
+'''
+    ld = [{"@context": "https://schema.org", "@type": "ItemList", "itemListElement": [
+        {"@type": "ListItem", "position": i + 1, "url": BASE + w["path"], "name": w["title"]} for i, w in enumerate(WATCH)]},
+        crumbs([("Videos", "watch/")])]
+    return page("watch/", "Videos | Evan Lopez, Austin Comedian",
+                "Videos from Austin stand-up comedian Evan Lopez, each with a short write-up.", body, ld)
+
+
 # ---------------------------------------------------------------- extras
 REDIRECTS = {"about": "/press/", "shows": "/#shows", "contact": "/#book", "lessons": "/", "blogs": "/",
              "the-future-of-ai": "/", "sample-page": "/", "category/uncategorized": "/", "author/iamevanlopez": "/",
@@ -747,6 +1109,11 @@ def sitemap(paths):
 
 def llms():
     eps = "\n".join(f"- {x['title']} ({x['date']})" for x in POD["episodes"][:5])
+    def entries(items, head):
+        return (f"## {head}\n" + "\n".join(
+            f"- [{w['title']}]({BASE}{w['path']}) ({w['published']}): " + re.split(r"(?<=[.!?])\s", w["summary"].strip(), 1)[0]
+            for w in items[:30]) + "\n\n") if items else ""
+    videos = entries(EP_PAGES, "Podcast episode pages (with write-ups)") + entries(WATCH, "Videos (with write-ups)")
     weekly = "\n".join(f"- {w['name']}: every {['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'][w['weekday']]} at {ftime(weekly_dates(w,1)[0])}, {w['venue']}, {w['address']}, {w['city']}, {w['region']}. Presented by {w['presenter']}. Tickets: {w['tickets']}" for w in SHOWS["weekly"])
     return f"""# Evan Lopez
 
@@ -767,14 +1134,14 @@ def llms():
 - Recent episodes:
 {eps}
 
-## Live shows
+{videos}## Live shows
 {weekly}
 - Tour dates are listed at {BASE}#shows as they are announced.
 
 ## Pages
 - Home: {BASE}
 - Podcast: {BASE}podcast/
-- Austin comedy guide (where to see stand-up in Austin): {BASE}austin-comedy/
+{"- Videos: " + BASE + "watch/" + chr(10) if WATCH else ""}- Austin comedy guide (where to see stand-up in Austin): {BASE}austin-comedy/
 - Press kit (bios, credits, photos): {BASE}press/
 
 ## Social
@@ -788,11 +1155,30 @@ def llms():
 def main():
     pages = {"index.html": home(), "podcast/index.html": podcast_page(), "austin-comedy/index.html": austin_page(),
              "press/index.html": press_page(), "join/index.html": join_page(), "404.html": not_found()}
+    # drop generated write-up pages whose write-up was removed (only folders holding nothing but index.html)
+    for base, items in (("watch", WATCH), ("podcast", EP_PAGES)):
+        bdir = os.path.join(ROOT, base)
+        if not os.path.isdir(bdir):
+            continue
+        keep = {w["slug"] for w in items}
+        for d in os.listdir(bdir):
+            sub = os.path.join(bdir, d)
+            if d not in keep and os.path.isdir(sub) and os.listdir(sub) == ["index.html"]:
+                os.remove(os.path.join(sub, "index.html")); os.rmdir(sub)
+    if not WATCH and os.path.isdir(os.path.join(ROOT, "watch")) and os.listdir(os.path.join(ROOT, "watch")) == ["index.html"]:
+        os.remove(os.path.join(ROOT, "watch/index.html")); os.rmdir(os.path.join(ROOT, "watch"))
+    for w in EP_PAGES:
+        pages[w["path"] + "index.html"] = episode_page(w)
+    if WATCH:
+        pages["watch/index.html"] = watch_index()
+        for w in WATCH:
+            pages[w["path"] + "index.html"] = watch_page(w)
     for p, t in pages.items():
         write(p, t)
     for src, to in REDIRECTS.items():
         write(f"{src}/index.html", redirect_stub(to))
-    write("sitemap.xml", sitemap(["", "podcast/", "austin-comedy/", "press/", "join/"]))
+    write("sitemap.xml", sitemap(["", "podcast/"] + [w["path"] for w in EP_PAGES] + ["austin-comedy/", "press/", "join/"]
+                                 + (["watch/"] + [w["path"] for w in WATCH] if WATCH else [])))
     write("llms.txt", llms())
     print(f"built {len(pages)} pages + {len(REDIRECTS)} redirects")
 
