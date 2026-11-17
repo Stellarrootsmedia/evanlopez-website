@@ -41,17 +41,18 @@
     el.replaceWith(f);
   }, { once: true }));
 
-  // forms → FormSubmit (ajax)
+  // forms → Brevo sign-up form or FormSubmit (ajax)
   $$('form[data-endpoint]').forEach(form => form.addEventListener('submit', async ev => {
     ev.preventDefault();
     const note = $('.form-note', form), b = $('button[type=submit]', form), label = b.textContent;
     b.disabled = true; b.textContent = 'Sending…';
     try {
       const res = await fetch(form.dataset.endpoint, { method: 'POST', headers: { Accept: 'application/json' }, body: new FormData(form) });
-      if (!res.ok) throw new Error(res.status);
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok || data.success === false) throw new Error(res.status);
       form.reset();
       note.className = 'form-note ok';
-      note.textContent = form.classList.contains('signup') ? "You're on the list. Talk soon." : "Got it. I'll get back to you soon.";
+      note.textContent = form.dataset.ok || (form.classList.contains('signup') ? "You're on the list. Talk soon." : "Got it. I'll get back to you soon.");
       if (window.gtag) gtag('event', form.classList.contains('signup') ? 'sign_up' : 'generate_lead');
     } catch {
       note.className = 'form-note err';

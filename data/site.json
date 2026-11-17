@@ -8,7 +8,8 @@
   "region": "TX",
   "tagline": "Austin stand-up comedian, podcast host, and bird enthusiast.",
   "signup": {
-    "_readme": "The on-site form (home, podcast page and /join/) emails each new sign-up to the address above via FormSubmit until the Brevo fan-list form is connected. signup_url, if set, swaps the form for a button to that URL.",
+    "_readme": "The on-site form (home, podcast page and /join/) posts to the Brevo form in brevo_form, which adds people to the Brevo list Evan Lopez Fans (#43) after they click the confirm email. If brevo_form is empty the form falls back to FormSubmit, which emails each sign-up to the address above. signup_url, if set, swaps the form for a button to that URL.",
+    "brevo_form": "https://28b54265.sibforms.com/serve/MUIFAIzrFSk27IE58Zl3a43c8uZmrqD77mNvg1ZPmvK-KQCJSkmj2hc_xn7FcQyV7DRnhJoWc1UWY2tPnJGU6E1ONO-52xHGFgySQE_Jl3f0gK3cYkqH3oyzxYiXqRlItanCbYwT9pVV8vMWONzQLqClJh5XK4iAniyalycKUoNV7fyMRI5LRnPo_QnivHN1PIJxtb1fuEyPRcf6",
     "signup_url": "",
     "headline": "Get an email when I'm in your city",
     "sub": "First dibs on tickets, merch drops and new episodes. No spam, just me, occasionally, with something good."

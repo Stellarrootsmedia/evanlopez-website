@@ -9,7 +9,7 @@ from zoneinfo import ZoneInfo
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TZ = ZoneInfo("America/Chicago")
-V = "18"  # cache-bust: bump when css/js change
+V = "19"  # cache-bust: bump when css/js change
 
 
 def load(name):
@@ -127,6 +127,19 @@ def signup_form(fid, big=False):
     if su["signup_url"]:
         return (f'<a class="btn btn-primary{" btn-lg" if big else ""}" href="{su["signup_url"]}" target="_blank" rel="noopener">'
                 f'Get show alerts {icon("arrow", 18)}</a>')
+    if su.get("brevo_form"):  # Brevo sign-up form: field names are Brevo's attribute names
+        return f'''<form class="signup" id="{fid}" data-endpoint="{su["brevo_form"]}?isAjax=1" data-ok="Almost there. Check your email and click the link to confirm.">
+          <input type="text" name="email_address_check" value="" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <input type="hidden" name="locale" value="en">
+          <label class="sr" for="{fid}-email">Email</label>
+          <input id="{fid}-email" type="email" name="EMAIL" placeholder="Email" autocomplete="email" required>
+          <label class="sr" for="{fid}-name">First name</label>
+          <input id="{fid}-name" type="text" name="FIRSTNAME" placeholder="First name" autocomplete="given-name" maxlength="200">
+          <label class="sr" for="{fid}-city">City</label>
+          <input id="{fid}-city" type="text" name="CITY" placeholder="Your city" autocomplete="address-level2" maxlength="200" required>
+          <button class="btn btn-primary" type="submit">Get alerts</button>
+          <p class="form-note" role="status">Tickets, merch drops and new episodes. Unsubscribe anytime.</p>
+        </form>'''
     return f'''<form class="signup" id="{fid}" data-endpoint="https://formsubmit.co/ajax/{S["email"]}">
           <input type="hidden" name="_subject" value="New fan sign-up (evanlopez.com)">
           <input type="hidden" name="_template" value="table">
